@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Phase 7 Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+
+      /* Keep content out from under status bar / notches */
+      padding-top: constant(safe-area-inset-top);
+      padding-top: env(safe-area-inset-top);
+    }
+
+    header.top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: #111827;
+      color: #f9fafb;
+      margin-top: 4px; /* small breathing room below status bar */
+    }
+
+    .app-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+    }
+
+    .status-text {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    label.season-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    label.season-toggle span {
+      white-space: nowrap;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.1);
+    }
+
+    .link-button {
+      background: none;
+      border: none;
+      color: #93c5fd;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 2px 4px;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 8px;
+      gap: 8px;
+    }
+
+    .map-wrapper {
+      position: relative;
+      margin: 0 auto;
+      max-width: 100%;
+      overflow: auto;
+      background: #e5e7eb;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+    }
+
+    #mapCanvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Popup card */
+#lotPopup {
+  position: absolute;
+  max-width: 260px;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  z-index: 500;
+
+  /* New: make it behave better */
+  max-height: 60vh;          /* never taller than 60% of screen */
+  overflow-y: auto;          /* scroll inside if content is long */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+/* Mobile-specific tweaks */
+@media (max-width: 768px) {
+  #lotPopup {
+    max-width: 60vw;         /* narrower on phones */
+    font-size: 0.7rem;       /* smaller text */
+    padding: 4px 6px;        /* tighter padding */
+  }
+}
+
+
+
+    #lotPopup.hidden {
+      display: none;
+    }
+
+    #lotPopup h3 {
+      margin: 0 0 4px 0;
+      font-size: 0.9rem;
+    }
+
+    .popup-close {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+    }
+
+    .popup-inner p {
+      margin: 2px 0;
+    }
+
+    /* Slightly smaller popup text on phones */
+    @media (max-width: 600px) {
+      #lotPopup {
+        font-size: 0.75rem;
+      }
+      #lotPopup h3 {
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Privacy panel / modal */
+    .privacy-panel {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .privacy-panel.hidden {
+      display: none;
+    }
+
+    .privacy-content {
+      background: #ffffff;
+      max-width: 600px;
+      width: 90%;
+      padding: 16px 20px;
+      border-radius: 8px;
+      max-height: 80vh;
+      overflow-y: auto;
+      font-size: 0.9rem;
+    }
+
+    .privacy-content h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
+    .privacy-content ul {
+      padding-left: 20px;
+    }
+
+    .privacy-content button {
+      margin-top: 12px;
+      padding: 4px 10px;
+      font-size: 0.85rem;
+    }
+
+    footer {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      text-align: center;
+      color: #6b7280;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="top-bar">
+    <div class="app-title">
+      Phase 7 Neighborhood Map
+    </div>
+    <div class="top-bar-right">
+      <span id="lockStatus" class="status-text">
+        Season view only (privacy mode)
+      </span>
+      <label class="season-toggle">
+        <input type="checkbox" id="seasonOnlyCheckbox" checked />
+        <span id="seasonOnlyLabel">Season Only</span>
+      </label>
+      <button id="privacyButton" class="link-button">Privacy</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="map-wrapper" id="mapWrapper">
+      <canvas id="mapCanvas"></canvas>
+      <div id="lotPopup" class="hidden"></div>
+    </div>
+  </main>
+
+  <footer>
+    This map is for Phase 7 residents. Seasonal view hides personal information by default.
+  </footer>
+
+  <!-- Privacy modal -->
+  <div id="privacyPanel" class="privacy-panel hidden">
+    <div class="privacy-content">
+      <h2>Privacy &amp; Data Use</h2>
+      <p>
+        This map is provided for residents of Phase 7 for neighborhood reference and seasonal displays.
+        It does not send or share your data with any online service.
+      </p>
+      <ul>
+        <li>By default, the map only shows seasonal stations (like <em>Holiday Season</em> displays).</li>
+        <li>Names, addresses, phone numbers, and other personal details are hidden in the default view.</li>
+        <li>Full resident information is only shown after entering a password, intended for internal community use.</li>
+        <li>Certain homes may be flagged as sensitive, and their details are limited even in the unlocked view.</li>
+      </ul>
+      <p>
+        If you have questions or want your information removed or changed, please contact the Phase 7 coordinators.
+      </p>
+      <button id="privacyCloseButton">Close</button>
+    </div>
+  </div>
+
+  <!-- Data file generated by your Python script -->
+  <script src="phase7_merged_lots.js"></script>
+
+  <script>
+    // ----- Global state -----
+    // Defaults (used if text files can't be read)
+    let PASSWORD = "Rudolf122025";
+    let currentSeasonName = "Holiday Season";
+
+    // Use the new data object produced by build_phase7_js.py
+    const LOTS = (typeof phaseResidentsData !== "undefined") ? phaseResidentsData : [];
+
+    let isSeasonOnly = true;
+    let isUnlocked = false;
+
+    let canvas, ctx, mapImg, mapWrapper;
+
+    // ----- Season name & icon helpers -----
+    function getSeasonIcon(name) {
+      const lower = name.toLowerCase();
+      if (lower.includes("halloween")) return "🎃";
+      if (lower.includes("christmas")) return "🎄";
+      if (lower.includes("holiday")) return "🎉";
+      if (lower.includes("light")) return "✨";
+      if (lower.includes("spring")) return "🌸";
+      if (lower.includes("summer")) return "☀️";
+      if (lower.includes("fall") || lower.includes("autumn")) return "🍂";
+      return "⭐";
+    }
+
+    function updateSeasonToggleLabel() {
+      const labelSpan = document.getElementById("seasonOnlyLabel");
+      const icon = getSeasonIcon(currentSeasonName);
+      labelSpan.textContent = icon + " " + currentSeasonName + " Only";
+    }
+
+    function updateLockStatusUI() {
+      const lockStatus = document.getElementById("lockStatus");
+      if (!isUnlocked) {
+        lockStatus.textContent = "Season view only (privacy mode)";
+      } else {
+        lockStatus.textContent = "Full map unlocked (session only)";
+      }
+    }
+
+    function fetchSeasonName() {
+      fetch("season_name.txt")
+        .then(r => r.text())
+        .then(text => {
+          const trimmed = text.trim();
+          if (trimmed) {
+            currentSeasonName = trimmed;
+          }
+          updateSeasonToggleLabel();
+        })
+        .catch(() => {
+          // Use default
+          updateSeasonToggleLabel();
+        });
+    }
+
+    function fetchPassword() {
+      fetch("phase7_password.txt")
+        .then(r => r.text())
+        .then(text => {
+          const trimmed = text.trim();
+          if (trimmed) {
+            PASSWORD = trimmed;
+          }
+          console.log("Password loaded from file.");
+        })
+        .catch(err => {
+          console.warn("Could not load phase7_password.txt, using default PASSWORD.", err);
+        });
+    }
+
+    // ----- Privacy panel -----
+    function setupPrivacyPanel() {
+      const privacyButton = document.getElementById("privacyButton");
+      const panel = document.getElementById("privacyPanel");
+      const closeButton = document.getElementById("privacyCloseButton");
+
+      if (!privacyButton || !panel || !closeButton) return;
+
+      privacyButton.addEventListener("click", () => {
+        panel.classList.remove("hidden");
+      });
+
+      closeButton.addEventListener("click", () => {
+        panel.classList.add("hidden");
+      });
+
+      panel.addEventListener("click", (e) => {
+        if (e.target === panel) {
+          panel.classList.add("hidden");
+        }
+      });
+    }
+
+    // ----- Map + lots -----
+
+    function isSeasonStation(lot) {
+      return !!lot.isChristmasStation;
+    }
+
+    function getSeasonDetails(lot) {
+      return lot.christmasStationDetails || "";
+    }
+
+    function shouldShowLot(lot) {
+      if (isSeasonOnly && !isSeasonStation(lot)) {
+        return false;
+      }
+      return true;
+    }
+
+    function drawLots() {
+      if (!ctx || !mapImg) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(mapImg, 0, 0, canvas.width, canvas.height);
+
+      const icon = getSeasonIcon(currentSeasonName);
+
+      LOTS.forEach(lot => {
+        if (!shouldShowLot(lot)) return;
+
+        const x = Number(lot.x);
+        const y = Number(lot.y);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+
+        const radius = 5;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+
+        if (isSeasonStation(lot)) {
+          ctx.fillStyle = "#2563eb"; // seasonal station
+        } else {
+          ctx.fillStyle = "#9ca3af"; // regular lot
+        }
+
+        ctx.fill();
+        ctx.closePath();
+
+        if (isSeasonStation(lot)) {
+          ctx.font = "16px system-ui, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(icon, x, y - 14);
+        }
+      });
+    }
+
+    function findLotAt(x, y) {
+      const threshold = 25;
+      const thresholdSq = threshold * threshold;
+      let bestLot = null;
+      let bestDistSq = thresholdSq;
+
+      LOTS.forEach(lot => {
+        if (!shouldShowLot(lot)) return;
+
+        const lx = Number(lot.x);
+        const ly = Number(lot.y);
+        if (!Number.isFinite(lx) || !Number.isFinite(ly)) return;
+
+        const dx = x - lx;
+        const dy = y - ly;
+        const distSq = dx * dx + dy * dy;
+
+        if (distSq <= bestDistSq) {
+          bestDistSq = distSq;
+          bestLot = lot;
+        }
+      });
+
+      return bestLot;
+    }
+
+    // ----- Popup content -----
+    function buildPopupContent(lot) {
+      const seasonDetails = getSeasonDetails(lot);
+
+      // LOCKED view: season-only info, no personal details
+      if (!isUnlocked) {
+        if (isSeasonStation(lot)) {
+          return `
+            <div class="popup-inner">
+              <h3>${currentSeasonName} Station</h3>
+              ${seasonDetails ? `<p>${seasonDetails}</p>` : ""}
+              <button class="popup-close" type="button" onclick="hidePopup()">Close</button>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="popup-inner">
+              <h3>${currentSeasonName} Map</h3>
+              <button class="popup-close" type="button" onclick="hidePopup()">Close</button>
+            </div>
+          `;
+        }
+      }
+
+      // UNLOCKED view: full details (still respecting sensitivity)
+      const lines = [];
+
+      if (lot.lotNumber !== undefined && lot.lotNumber !== null) {
+        lines.push(`<h3>Lot ${lot.lotNumber}</h3>`);
+      } else {
+        lines.push(`<h3>Lot</h3>`);
+      }
+
+      const pName = lot.primaryName || "";
+      const sName = lot.secondaryName || "";
+      if (pName) {
+        const nameLine = sName ? `${pName} &amp; ${sName}` : pName;
+        lines.push(`<p><strong>${nameLine}</strong></p>`);
+      }
+
+      if (lot.address) {
+        lines.push(`<p>${lot.address}</p>`);
+      }
+
+      if (lot.homeTypeStyle) {
+        lines.push(`<p>Home: ${lot.homeTypeStyle}</p>`);
+      }
+
+      if (lot.contractStatus) {
+        lines.push(`<p>Status: ${lot.contractStatus}</p>`);
+      }
+
+      const isSensitive = !!lot.isSensitive;
+      if (isSensitive) {
+        lines.push(`<p><em>Details limited for privacy.</em></p>`);
+      } else {
+        if (lot.originCityState) {
+          lines.push(`<p>From: ${lot.originCityState}</p>`);
+        }
+        if (lot.phone) {
+          lines.push(`<p>Phone: ${lot.phone}</p>`);
+        }
+        if (lot.notes) {
+          lines.push(`<p>Notes: ${lot.notes}</p>`);
+        }
+      }
+
+      if (isSeasonStation(lot) && seasonDetails) {
+        lines.push(
+          `<p><strong>${currentSeasonName} Station:</strong> ${seasonDetails}</p>`
+        );
+      }
+
+      lines.push(`<button class="popup-close" type="button" onclick="hidePopup()">Close</button>`);
+
+      return `<div class="popup-inner">${lines.join("")}</div>`;
+    }
+
+function showPopup(lot, cssX, cssY) {
+  const popup = document.getElementById("lotPopup");
+  const wrapperRect = mapWrapper.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+
+  // Build content and show so we can measure it
+  popup.innerHTML = buildPopupContent(lot);
+  popup.classList.remove("hidden");
+
+  const offsetX = canvasRect.left - wrapperRect.left;
+  const offsetY = canvasRect.top - wrapperRect.top;
+
+  // Start near the tap point (wrapper coordinates)
+  let left = cssX + offsetX + 12;
+  let top = cssY + offsetY + 12;
+
+  // Temporarily position it so we can get its true size
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+
+  const popupRect = popup.getBoundingClientRect();
+
+  // On small screens, bias toward centering horizontally
+  if (window.innerWidth <= 768) {
+    left = (wrapperRect.width - popupRect.width) / 2;
+  }
+
+  // Clamp inside the wrapper with a little margin
+  const maxLeft = wrapperRect.width - popupRect.width - 8;
+  const maxTop = wrapperRect.height - popupRect.height - 8;
+
+  left = Math.max(8, Math.min(left, maxLeft));
+  top = Math.max(8, Math.min(top, maxTop));
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+}
+
+
+
+    function hidePopup() {
+      const popup = document.getElementById("lotPopup");
+      popup.classList.add("hidden");
+    }
+    window.hidePopup = hidePopup;
+
+    // ----- Click / tap handling with scaling -----
+    function handleCanvasTap(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      const canvasX = (clientX - rect.left) * scaleX;
+      const canvasY = (clientY - rect.top) * scaleY;
+
+      const lot = findLotAt(canvasX, canvasY);
+      if (lot) {
+        const cssX = clientX - rect.left;
+        const cssY = clientY - rect.top;
+        showPopup(lot, cssX, cssY);
+      } else {
+        hidePopup();
+      }
+    }
+
+    function setupCanvasEvents() {
+      canvas.addEventListener("click", function (e) {
+        handleCanvasTap(e.clientX, e.clientY);
+      });
+
+      canvas.addEventListener("touchend", function (e) {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+          const t = e.changedTouches[0];
+          handleCanvasTap(t.clientX, t.clientY);
+        }
+      });
+    }
+
+    // ----- Season-only / unlock controls -----
+    function setupSeasonToggle() {
+      const checkbox = document.getElementById("seasonOnlyCheckbox");
+      if (!checkbox) return;
+
+      checkbox.addEventListener("change", () => {
+        if (!isUnlocked && !checkbox.checked) {
+          const entered = window.prompt("Enter password to unlock full map:");
+          if (entered === PASSWORD) {
+            isUnlocked = true;
+            isSeasonOnly = false;
+            updateLockStatusUI();
+            drawLots();
+          } else {
+            alert("Incorrect password. Seasonal privacy view remains enabled.");
+            checkbox.checked = true;
+            isSeasonOnly = true;
+            updateLockStatusUI();
+            drawLots();
+          }
+        } else {
+          isSeasonOnly = checkbox.checked;
+          drawLots();
+        }
+      });
+    }
+
+    // ----- Initialization -----
+    function initMap() {
+      canvas = document.getElementById("mapCanvas");
+      mapWrapper = document.getElementById("mapWrapper");
+      if (!canvas || !mapWrapper) return;
+
+      ctx = canvas.getContext("2d");
+      mapImg = new Image();
+      mapImg.src = "Phase7Org.png";
+      mapImg.onload = function () {
+        canvas.width = mapImg.width;
+        canvas.height = mapImg.height;
+        drawLots();
+      };
+
+      setupCanvasEvents();
+    }
+
+    window.addEventListener("load", function () {
+      updateLockStatusUI();
+      fetchSeasonName();
+      fetchPassword();
+      setupPrivacyPanel();
+      setupSeasonToggle();
+      initMap();
+    });
+  </script>
+</body>
+</html>
