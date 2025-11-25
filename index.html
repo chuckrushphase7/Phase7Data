@@ -233,20 +233,22 @@
 
   <!-- Download buttons -->
   <div id="download-bar">
-    <button
-      onclick="window.location.href='Phase7Residents.apk';"
-      style="
-        padding: 8px 16px;
-        border-radius: 999px;
-        border: 1px solid #2563eb;
-        background: #2563eb;
-        color: white;
-        font-size: 0.9rem;
-        cursor: pointer;
-        margin-right: 8px;
-      ">
-      Download Android App
-    </button>
+<button
+  id="apkDownloadButton"
+  onclick="window.location.href='Phase7Residents.apk';"
+  style="
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-right: 8px;
+  ">
+  Download Android App
+</button>
+
 
     <button
       onclick="document.getElementById('ios-instructions')?.scrollIntoView({ behavior: 'smooth' });"
@@ -317,13 +319,25 @@
   </div>
 
   <!-- Data files -->
-  <script src="phase7_merged_lots.js"></script>
-  <script src="mapped_sites.js"></script>
+<script src="phase7_merged_lots.js"></script>
+<script src="mapped_sites.js"></script>
+<script src="apk_info.js"></script>
+
 
   <script>
     // ----- Global state -----
     let PASSWORD = "Rudolf122025";
     let currentSeasonName = "Holiday Season";
+	// ----- APK last-updated label on download button -----
+document.addEventListener("DOMContentLoaded", function () {
+  if (typeof APK_LAST_UPDATED !== "undefined") {
+    const btn = document.getElementById("apkDownloadButton");
+    if (btn) {
+      btn.textContent = "Download Android App (" + APK_LAST_UPDATED + ")";
+    }
+  }
+});
+
 
     // Use the new data object produced by build_phase7_js.py
     const LOTS = (typeof phaseResidentsData !== "undefined") ? phaseResidentsData : [];
