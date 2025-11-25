@@ -233,22 +233,21 @@
 
   <!-- Download buttons -->
   <div id="download-bar">
-<button
-  id="apkDownloadButton"
-  onclick="window.location.href='Phase7Residents.apk';"
-  style="
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid #2563eb;
-    background: #2563eb;
-    color: white;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-right: 8px;
-  ">
-  Download Android App
-</button>
-
+    <button
+      id="apkDownloadButton"
+      onclick="handleAndroidDownloadClick();"
+      style="
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1px solid #2563eb;
+        background: #2563eb;
+        color: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        margin-right: 8px;
+      ">
+      Download Android App
+    </button>
 
     <button
       onclick="document.getElementById('ios-instructions')?.scrollIntoView({ behavior: 'smooth' });"
@@ -270,6 +269,31 @@
       <canvas id="mapCanvas"></canvas>
       <div id="lotPopup" class="hidden"></div>
     </div>
+
+    <!-- Android install instructions -->
+    <section id="android-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+      <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">
+        Installing the Android App
+      </h2>
+
+      <p style="font-size: 0.9rem; margin-bottom: 6px;">
+        The Android version of the Phase 7 Neighborhood Map is installed from an <code>.apk</code> file.
+        Follow these steps on your Android phone or tablet:
+      </p>
+
+      <ol style="font-size: 0.88rem; padding-left: 20px; line-height: 1.4;">
+        <li>Tap the <strong>Download Android App</strong> button above.</li>
+        <li>Your browser may warn that this type of file can harm your device. This is a standard warning for apps installed from outside the Play Store.</li>
+        <li>Tap <strong>Download</strong> or <strong>Download anyway</strong> to continue.</li>
+        <li>When the download finishes, tap the notification, or open your <strong>Downloads</strong> app and select <code>Phase7Residents.apk</code>.</li>
+        <li>If prompted, allow your browser or file manager to install apps from this source.</li>
+        <li>Tap <strong>Install</strong>, then <strong>Open</strong> to launch the Phase 7 app.</li>
+      </ol>
+
+      <p style="font-size: 0.85rem; margin-top: 8px; color: #444;">
+        After installation, you can open the Phase 7 app from your home screen like any other app.
+      </p>
+    </section>
 
     <section id="ios-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
       <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">
@@ -319,25 +343,32 @@
   </div>
 
   <!-- Data files -->
-<script src="phase7_merged_lots.js"></script>
-<script src="mapped_sites.js"></script>
-<script src="apk_info.js"></script>
-
+  <script src="phase7_merged_lots.js"></script>
+  <script src="mapped_sites.js"></script>
+  <script src="apk_info.js"></script>
 
   <script>
     // ----- Global state -----
     let PASSWORD = "Rudolf122025";
     let currentSeasonName = "Holiday Season";
-	// ----- APK last-updated label on download button -----
-document.addEventListener("DOMContentLoaded", function () {
-  if (typeof APK_LAST_UPDATED !== "undefined") {
-    const btn = document.getElementById("apkDownloadButton");
-    if (btn) {
-      btn.textContent = "Download Android App (" + APK_LAST_UPDATED + ")";
-    }
-  }
-});
 
+    // ----- APK last-updated label on download button -----
+    document.addEventListener("DOMContentLoaded", function () {
+      if (typeof APK_LAST_UPDATED !== "undefined") {
+        const btn = document.getElementById("apkDownloadButton");
+        if (btn) {
+          btn.textContent = "Download Android App (" + APK_LAST_UPDATED + ")";
+        }
+      }
+    });
+
+    // ----- Android download handler scaffold -----
+    // In a regular browser, this triggers a normal APK download.
+    // In the Android WebView wrapper, you can intercept this URL (Phase7Residents.apk)
+    // via shouldOverrideUrlLoading / a DownloadListener and hand off to DownloadManager.
+    function handleAndroidDownloadClick() {
+      window.location.href = "Phase7Residents.apk";
+    }
 
     // Use the new data object produced by build_phase7_js.py
     const LOTS = (typeof phaseResidentsData !== "undefined") ? phaseResidentsData : [];
@@ -369,7 +400,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateLockStatusUI() {
       const lockStatus = document.getElementById("lockStatus");
       if (!isUnlocked) {
-        lockStatus.textContent = "Season view only (privacy mode)";
+        lockStatus.textContent = "Season view only (privacy mode)"
       } else {
         lockStatus.textContent = "Full map unlocked (session only)";
       }
@@ -447,6 +478,48 @@ document.addEventListener("DOMContentLoaded", function () {
     // ================================
     // DRAW MAPPED PARKS & PONDS
     // ================================
+
+    // Debug flag: set to true to draw vertex markers for mapped sites.
+    const DEBUG_POLYGONS = false;
+
+    // Ensure polygon vertices are ordered to prevent self-crossing.
+    function orderPolygonPoints(points) {
+      if (!points || points.length < 3) return points;
+
+      // Compute centroid
+      let cx = 0, cy = 0;
+      for (const p of points) {
+        cx += p[0];
+        cy += p[1];
+      }
+      cx /= points.length;
+      cy /= points.length;
+
+      // Sort by angle around centroid
+      return points
+        .map(p => ({
+          x: p[0],
+          y: p[1],
+          angle: Math.atan2(p[1] - cy, p[0] - cx)
+        }))
+        .sort((a, b) => a.angle - b.angle)
+        .map(p => [p.x, p.y]);
+    }
+
+    // Optional debug helper: draws red dots at polygon vertices with indices.
+    function debugPolygonVertices(ctx, points) {
+      points.forEach((p, i) => {
+        ctx.beginPath();
+        ctx.arc(p[0], p[1], 3, 0, Math.PI * 2);
+        ctx.fillStyle = "red";
+        ctx.fill();
+
+        ctx.font = "10px system-ui, sans-serif";
+        ctx.fillStyle = "black";
+        ctx.fillText(i.toString(), p[0] + 4, p[1] - 4);
+      });
+    }
+
     function drawAllMappedSites(ctx) {
       if (typeof MAPPED_SITES === "undefined" || !MAPPED_SITES || MAPPED_SITES.length === 0) return;
 
@@ -458,28 +531,35 @@ document.addEventListener("DOMContentLoaded", function () {
     function drawPolygon(ctx, points, type) {
       if (!points || points.length < 3) return;
 
+      // Reorder vertices to prevent self-crossing and giant triangles
+      const ordered = orderPolygonPoints(points);
+
       // default: ponds = cyan
       let stroke = "rgba(0,255,255,0.9)";
-      let fill   = "rgba(0,255,255,0.15)";
+      let fill = "rgba(0,255,255,0.15)";
 
       if (type === "park") {
         stroke = "rgba(0,200,0,0.9)";   // parks = green
-        fill   = "rgba(0,200,0,0.15)";
+        fill = "rgba(0,200,0,0.15)";
       }
 
       ctx.beginPath();
-      ctx.moveTo(points[0][0], points[0][1]);
-      for (let i = 1; i < points.length; i++) {
-        ctx.lineTo(points[i][0], points[i][1]);
+      ctx.moveTo(ordered[0][0], ordered[0][1]);
+      for (let i = 1; i < ordered.length; i++) {
+        ctx.lineTo(ordered[i][0], ordered[i][1]);
       }
       ctx.closePath();
 
-      ctx.fillStyle   = fill;
+      ctx.fillStyle = fill;
       ctx.strokeStyle = stroke;
-      ctx.lineWidth   = 2;
+      ctx.lineWidth = 2;
 
       ctx.fill();
       ctx.stroke();
+
+      if (DEBUG_POLYGONS) {
+        debugPolygonVertices(ctx, ordered);
+      }
     }
 
     // ----- Map + lots -----
