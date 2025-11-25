@@ -210,9 +210,27 @@
     }
   </style>
 </head>
+
+
+<body>
+  <header class="top-bar">
+    <div class="app-title">
+      Phase 7 Neighborhood Map
+    </div>
+    <div class="top-bar-right">
+      <span id="lockStatus" class="status-text">
+        Season view only (privacy mode)
+      </span>
+      <label class="season-toggle">
+        <input type="checkbox" id="seasonOnlyCheckbox" checked />
+        <span id="seasonOnlyLabel">Season Only</span>
+      </label>
+      <button id="privacyButton" class="link-button">Privacy</button>
+    </div>
+  </header>
 <div id="download-bar" style="margin: 10px 0; text-align: center;">
   <button
-    onclick="window.location.href='YOUR_APK_FILENAME.apk';"
+    onclick="window.location.href='Phase7Residents.apk';"
     style="
       padding: 8px 16px;
       border-radius: 999px;
@@ -240,24 +258,6 @@
     iPhone / iPad Instructions
   </button>
 </div>
-
-<body>
-  <header class="top-bar">
-    <div class="app-title">
-      Phase 7 Neighborhood Map
-    </div>
-    <div class="top-bar-right">
-      <span id="lockStatus" class="status-text">
-        Season view only (privacy mode)
-      </span>
-      <label class="season-toggle">
-        <input type="checkbox" id="seasonOnlyCheckbox" checked />
-        <span id="seasonOnlyLabel">Season Only</span>
-      </label>
-      <button id="privacyButton" class="link-button">Privacy</button>
-    </div>
-  </header>
-
   <main>
     <div class="map-wrapper" id="mapWrapper">
       <canvas id="mapCanvas"></canvas>
