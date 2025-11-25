@@ -101,36 +101,39 @@
       height: auto;
     }
 
+    /* Download bar */
+    #download-bar {
+      margin: 10px 0;
+      text-align: center;
+    }
+
     /* Popup card */
-#lotPopup {
-  position: absolute;
-  max-width: 260px;
-  background: #ffffff;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  padding: 8px 10px;
-  font-size: 0.8rem;
-  z-index: 500;
+    #lotPopup {
+      position: absolute;
+      max-width: 260px;
+      background: #ffffff;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      z-index: 500;
 
-  /* New: make it behave better */
-  max-height: 60vh;          /* never taller than 60% of screen */
-  overflow-y: auto;          /* scroll inside if content is long */
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-}
+      max-height: 60vh;          /* never taller than 60% of screen */
+      overflow-y: auto;          /* scroll inside if content is long */
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
 
-/* Mobile-specific tweaks */
-@media (max-width: 768px) {
-  #lotPopup {
-    max-width: 60vw;         /* narrower on phones */
-    font-size: 0.7rem;       /* smaller text */
-    padding: 4px 6px;        /* tighter padding */
-  }
-}
-
-
+    /* Mobile-specific tweaks */
+    @media (max-width: 768px) {
+      #lotPopup {
+        max-width: 60vw;         /* narrower on phones */
+        font-size: 0.7rem;       /* smaller text */
+        padding: 4px 6px;        /* tighter padding */
+      }
+    }
 
     #lotPopup.hidden {
       display: none;
@@ -211,7 +214,6 @@
   </style>
 </head>
 
-
 <body>
   <header class="top-bar">
     <div class="app-title">
@@ -228,61 +230,65 @@
       <button id="privacyButton" class="link-button">Privacy</button>
     </div>
   </header>
-<button
-  onclick="window.location.href='Phase7Residents.apk';"
-  style="
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid #2563eb;
-    background: #2563eb;
-    color: white;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-right: 8px;
-  ">
-  Download Android App
-</button>
 
-  <button
-    onclick="document.getElementById('ios-instructions')?.scrollIntoView({ behavior: 'smooth' });"
-    style="
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid #6b7280;
-      background: white;
-      color: #374151;
-      font-size: 0.9rem;
-      cursor: pointer;
-    ">
-    iPhone / iPad Instructions
-  </button>
+  <!-- Download buttons -->
+  <div id="download-bar">
+    <button
+      onclick="window.location.href='Phase7Residents.apk';"
+      style="
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1px solid #2563eb;
+        background: #2563eb;
+        color: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        margin-right: 8px;
+      ">
+      Download Android App
+    </button>
+
+    <button
+      onclick="document.getElementById('ios-instructions')?.scrollIntoView({ behavior: 'smooth' });"
+      style="
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1px solid #6b7280;
+        background: white;
+        color: #374151;
+        font-size: 0.9rem;
+        cursor: pointer;
+      ">
+      iPhone / iPad Instructions
+    </button>
+  </div>
 
   <main>
     <div class="map-wrapper" id="mapWrapper">
       <canvas id="mapCanvas"></canvas>
       <div id="lotPopup" class="hidden"></div>
     </div>
-	<section id="ios-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
-  <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">
-    Using Phase 7 on iPhone / iPad
-  </h2>
 
-  <p style="font-size: 0.9rem; margin-bottom: 6px;">
-    The Phase 7 Neighborhood Map runs as a mobile website on Apple devices. You can add it to your Home Screen so it behaves just like an app:
-  </p>
+    <section id="ios-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+      <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">
+        Using Phase 7 on iPhone / iPad
+      </h2>
 
-  <ol style="font-size: 0.88rem; padding-left: 20px; line-height: 1.4;">
-    <li>Open this page in Safari on your iPhone or iPad.</li>
-    <li>Tap the <strong>Share</strong> icon (square with an arrow).</li>
-    <li>Scroll down and choose <strong>Add to Home Screen</strong>.</li>
-    <li>Enter a name like <em>Phase 7 Map</em> and tap <strong>Add</strong>.</li>
-  </ol>
+      <p style="font-size: 0.9rem; margin-bottom: 6px;">
+        The Phase 7 Neighborhood Map runs as a mobile website on Apple devices. You can add it to your Home Screen so it behaves just like an app:
+      </p>
 
-  <p style="font-size: 0.85rem; margin-top: 8px; color: #444;">
-    Once added, it will open full-screen with its own icon just like a native app.
-  </p>
-</section>
+      <ol style="font-size: 0.88rem; padding-left: 20px; line-height: 1.4;">
+        <li>Open this page in Safari on your iPhone or iPad.</li>
+        <li>Tap the <strong>Share</strong> icon (square with an arrow).</li>
+        <li>Scroll down and choose <strong>Add to Home Screen</strong>.</li>
+        <li>Enter a name like <em>Phase 7 Map</em> and tap <strong>Add</strong>.</li>
+      </ol>
 
+      <p style="font-size: 0.85rem; margin-top: 8px; color: #444;">
+        Once added, it will open full-screen with its own icon just like a native app.
+      </p>
+    </section>
   </main>
 
   <footer>
@@ -310,12 +316,12 @@
     </div>
   </div>
 
-  <!-- Data file generated by your Python script -->
+  <!-- Data files -->
   <script src="phase7_merged_lots.js"></script>
+  <script src="mapped_sites.js"></script>
 
   <script>
     // ----- Global state -----
-    // Defaults (used if text files can't be read)
     let PASSWORD = "Rudolf122025";
     let currentSeasonName = "Holiday Season";
 
@@ -366,7 +372,6 @@
           updateSeasonToggleLabel();
         })
         .catch(() => {
-          // Use default
           updateSeasonToggleLabel();
         });
     }
@@ -409,8 +414,7 @@
       });
     }
 
-    // ----- Map + lots -----
-
+    // ----- Season station helpers -----
     function isSeasonStation(lot) {
       return !!lot.isChristmasStation;
     }
@@ -426,11 +430,53 @@
       return true;
     }
 
+    // ================================
+    // DRAW MAPPED PARKS & PONDS
+    // ================================
+    function drawAllMappedSites(ctx) {
+      if (typeof MAPPED_SITES === "undefined" || !MAPPED_SITES || MAPPED_SITES.length === 0) return;
+
+      MAPPED_SITES.forEach(site => {
+        drawPolygon(ctx, site.polygon, site.type);
+      });
+    }
+
+    function drawPolygon(ctx, points, type) {
+      if (!points || points.length < 3) return;
+
+      // default: ponds = cyan
+      let stroke = "rgba(0,255,255,0.9)";
+      let fill   = "rgba(0,255,255,0.15)";
+
+      if (type === "park") {
+        stroke = "rgba(0,200,0,0.9)";   // parks = green
+        fill   = "rgba(0,200,0,0.15)";
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i][0], points[i][1]);
+      }
+      ctx.closePath();
+
+      ctx.fillStyle   = fill;
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth   = 2;
+
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // ----- Map + lots -----
     function drawLots() {
       if (!ctx || !mapImg) return;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(mapImg, 0, 0, canvas.width, canvas.height);
+
+      // Draw mapped sites (parks, ponds) before lots
+      drawAllMappedSites(ctx);
 
       const icon = getSeasonIcon(currentSeasonName);
 
@@ -567,45 +613,43 @@
       return `<div class="popup-inner">${lines.join("")}</div>`;
     }
 
-function showPopup(lot, cssX, cssY) {
-  const popup = document.getElementById("lotPopup");
-  const wrapperRect = mapWrapper.getBoundingClientRect();
-  const canvasRect = canvas.getBoundingClientRect();
+    function showPopup(lot, cssX, cssY) {
+      const popup = document.getElementById("lotPopup");
+      const wrapperRect = mapWrapper.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
 
-  // Build content and show so we can measure it
-  popup.innerHTML = buildPopupContent(lot);
-  popup.classList.remove("hidden");
+      // Build content and show so we can measure it
+      popup.innerHTML = buildPopupContent(lot);
+      popup.classList.remove("hidden");
 
-  const offsetX = canvasRect.left - wrapperRect.left;
-  const offsetY = canvasRect.top - wrapperRect.top;
+      const offsetX = canvasRect.left - wrapperRect.left;
+      const offsetY = canvasRect.top - wrapperRect.top;
 
-  // Start near the tap point (wrapper coordinates)
-  let left = cssX + offsetX + 12;
-  let top = cssY + offsetY + 12;
+      // Start near the tap point (wrapper coordinates)
+      let left = cssX + offsetX + 12;
+      let top = cssY + offsetY + 12;
 
-  // Temporarily position it so we can get its true size
-  popup.style.left = left + "px";
-  popup.style.top = top + "px";
+      // Temporarily position it so we can get its true size
+      popup.style.left = left + "px";
+      popup.style.top = top + "px";
 
-  const popupRect = popup.getBoundingClientRect();
+      const popupRect = popup.getBoundingClientRect();
 
-  // On small screens, bias toward centering horizontally
-  if (window.innerWidth <= 768) {
-    left = (wrapperRect.width - popupRect.width) / 2;
-  }
+      // On small screens, bias toward centering horizontally
+      if (window.innerWidth <= 768) {
+        left = (wrapperRect.width - popupRect.width) / 2;
+      }
 
-  // Clamp inside the wrapper with a little margin
-  const maxLeft = wrapperRect.width - popupRect.width - 8;
-  const maxTop = wrapperRect.height - popupRect.height - 8;
+      // Clamp inside the wrapper with a little margin
+      const maxLeft = wrapperRect.width - popupRect.width - 8;
+      const maxTop = wrapperRect.height - popupRect.height - 8;
 
-  left = Math.max(8, Math.min(left, maxLeft));
-  top = Math.max(8, Math.min(top, maxTop));
+      left = Math.max(8, Math.min(left, maxLeft));
+      top = Math.max(8, Math.min(top, maxTop));
 
-  popup.style.left = left + "px";
-  popup.style.top = top + "px";
-}
-
-
+      popup.style.left = left + "px";
+      popup.style.top = top + "px";
+    }
 
     function hidePopup() {
       const popup = document.getElementById("lotPopup");

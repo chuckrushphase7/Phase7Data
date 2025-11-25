@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Phase 7 Polygon Tracer</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    header {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    header .subtitle {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    main {
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      padding: 10px;
+    }
+
+    .left-panel {
+      flex: 2;
+      min-width: 0;
+      background: #111827;
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      overflow: auto;
+      border-radius: 4px;
+      border: 1px solid #374151;
+      background: #000;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .right-panel {
+      flex: 1;
+      min-width: 260px;
+      max-width: 360px;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .field-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+      font-size: 0.8rem;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+    }
+
+    .field-inline {
+      display: flex;
+      gap: 8px;
+    }
+
+    .field-inline .field-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    button {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #4b5563;
+      cursor: pointer;
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    button.primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #f9fafb;
+    }
+
+    button.danger {
+      background: #b91c1c;
+      border-color: #7f1d1d;
+      color: #f9fafb;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    #pointsList {
+      font-size: 0.75rem;
+      background: #f9fafb;
+      border-radius: 4px;
+      border: 1px solid #e5e7eb;
+      padding: 4px;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
+    #pointsList code {
+      font-size: 0.75rem;
+    }
+
+    #jsonOutput {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      min-height: 120px;
+      max-height: 220px;
+      resize: vertical;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        flex-direction: column;
+      }
+      .right-panel {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Phase 7 Polygon Tracer</h1>
+      <div class="subtitle">Click on the map to trace parks, ponds, and other mapped sites.</div>
+    </div>
+    <div class="subtitle">
+      Image: Phase7Org.png &mdash; Coordinates in original pixel space
+    </div>
+  </header>
+
+  <main>
+    <section class="left-panel">
+      <div class="hint" style="color:#d1d5db; margin-bottom:4px;">
+        Left-click to add vertices. Right-click (or use buttons) to close or clear. Zoom with Ctrl+MouseWheel (browser zoom) if needed.
+      </div>
+      <div class="canvas-wrapper">
+        <canvas id="mapCanvas"></canvas>
+      </div>
+    </section>
+
+    <section class="right-panel">
+      <div class="field-inline">
+        <div class="field-group">
+          <label for="siteId">Site ID</label>
+          <input id="siteId" type="text" placeholder="BlueGuitarPark" />
+        </div>
+        <div class="field-group">
+          <label for="displayName">Display Name</label>
+          <input id="displayName" type="text" placeholder="Blue Guitar Park" />
+        </div>
+      </div>
+
+      <div class="field-inline">
+        <div class="field-group">
+          <label for="phaseNumber">Phase</label>
+          <input id="phaseNumber" type="number" min="1" max="20" value="7" />
+        </div>
+        <div class="field-group">
+          <label for="siteType">Type</label>
+          <select id="siteType">
+            <option value="park">park</option>
+            <option value="pond">pond</option>
+            <option value="amenity">amenity</option>
+            <option value="other">other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button id="btnUndo" type="button">Undo last point</button>
+        <button id="btnClose" type="button">Close polygon</button>
+        <button id="btnClear" type="button" class="danger">Clear polygon</button>
+        <button id="btnCopyJson" type="button" class="primary">Copy JSON to clipboard</button>
+      </div>
+
+      <div class="field-group">
+        <label>Vertices (in image pixels)</label>
+        <div id="pointsList">
+          <span class="hint">No points yet. Click on the map to start tracing.</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="jsonOutput">Mapped site JSON snippet</label>
+        <textarea id="jsonOutput" spellcheck="false"></textarea>
+        <div class="hint">
+          Paste this into your mapped_sites.json (or JS file) as a new entry.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("mapCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const img = new Image();
+    img.src = "Phase7Org.png";
+
+    let points = [];
+    let isClosed = false;
+
+    img.onload = () => {
+      // Use the image's natural size as the canvas size.
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      redraw();
+    };
+
+    function redraw() {
+      // Draw background map
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+
+      if (points.length === 0) return;
+
+      // Draw polygon path
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(255, 255, 0, 0.9)";
+      ctx.fillStyle = "rgba(255, 255, 0, 0.15)";
+
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+      }
+      if (isClosed && points.length > 2) {
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.stroke();
+
+      // Draw vertices
+      for (const p of points) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = "#fbbf24";
+        ctx.fill();
+        ctx.strokeStyle = "#92400e";
+        ctx.stroke();
+      }
+    }
+
+    function addPointFromEvent(evt) {
+      if (!img.complete) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      const x = (evt.clientX - rect.left) * scaleX;
+      const y = (evt.clientY - rect.top) * scaleY;
+
+      points.push({ x: Math.round(x), y: Math.round(y) });
+      isClosed = false;
+      updatePointsList();
+      updateJsonOutput();
+      redraw();
+    }
+
+    canvas.addEventListener("click", (evt) => {
+      addPointFromEvent(evt);
+    });
+
+    canvas.addEventListener("contextmenu", (evt) => {
+      evt.preventDefault();
+      // Right click = close polygon
+      if (points.length >= 3) {
+        isClosed = true;
+        updateJsonOutput();
+        redraw();
+      }
+    });
+
+    function undoLastPoint() {
+      if (points.length > 0) {
+        points.pop();
+        isClosed = false;
+        updatePointsList();
+        updateJsonOutput();
+        redraw();
+      }
+    }
+
+    function clearPolygon() {
+      points = [];
+      isClosed = false;
+      updatePointsList();
+      updateJsonOutput();
+      redraw();
+    }
+
+    function closePolygon() {
+      if (points.length >= 3) {
+        isClosed = true;
+        updateJsonOutput();
+        redraw();
+      }
+    }
+
+    function updatePointsList() {
+      const container = document.getElementById("pointsList");
+      container.innerHTML = "";
+
+      if (points.length === 0) {
+        const span = document.createElement("span");
+        span.className = "hint";
+        span.textContent = "No points yet. Click on the map to start tracing.";
+        container.appendChild(span);
+        return;
+      }
+
+      const list = document.createElement("div");
+      points.forEach((p, idx) => {
+        const line = document.createElement("div");
+        line.innerHTML = `<code>[${p.x}, ${p.y}]</code> <span class="hint">#${idx + 1}</span>`;
+        list.appendChild(line);
+      });
+      container.appendChild(list);
+    }
+
+    function updateJsonOutput() {
+      const siteId = document.getElementById("siteId").value.trim() || "BlueGuitarPark";
+      const displayName = document.getElementById("displayName").value.trim() || "Blue Guitar Park";
+      const phaseNumber = parseInt(document.getElementById("phaseNumber").value, 10) || 7;
+      const siteType = document.getElementById("siteType").value || "park";
+
+      const polygonArray = points.map(p => [p.x, p.y]);
+
+      const snippet = {
+        siteId: siteId,
+        phaseNumber: phaseNumber,
+        type: siteType,
+        displayName: displayName,
+        polygon: polygonArray
+      };
+
+      document.getElementById("jsonOutput").value = JSON.stringify(snippet, null, 2);
+    }
+
+    document.getElementById("btnUndo").addEventListener("click", undoLastPoint);
+    document.getElementById("btnClear").addEventListener("click", clearPolygon);
+    document.getElementById("btnClose").addEventListener("click", closePolygon);
+
+    document.getElementById("btnCopyJson").addEventListener("click", () => {
+      const textarea = document.getElementById("jsonOutput");
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      try {
+        document.execCommand("copy");
+      } catch (e) {
+        console.warn("Copy failed, but text is selected.", e);
+      }
+    });
+
+    // Update JSON when metadata fields change
+    document.getElementById("siteId").addEventListener("input", updateJsonOutput);
+    document.getElementById("displayName").addEventListener("input", updateJsonOutput);
+    document.getElementById("phaseNumber").addEventListener("input", updateJsonOutput);
+    document.getElementById("siteType").addEventListener("change", updateJsonOutput);
+  </script>
+</body>
+</html>
