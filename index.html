@@ -210,6 +210,36 @@
     }
   </style>
 </head>
+<div id="download-bar" style="margin: 10px 0; text-align: center;">
+  <button
+    onclick="window.location.href='YOUR_APK_FILENAME.apk';"
+    style="
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid #2563eb;
+      background: #2563eb;
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-right: 8px;
+    ">
+    Download Android App
+  </button>
+
+  <button
+    onclick="document.getElementById('ios-instructions')?.scrollIntoView({ behavior: 'smooth' });"
+    style="
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid #6b7280;
+      background: white;
+      color: #374151;
+      font-size: 0.9rem;
+      cursor: pointer;
+    ">
+    iPhone / iPad Instructions
+  </button>
+</div>
 
 <body>
   <header class="top-bar">
