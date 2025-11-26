@@ -7,25 +7,26 @@ set "PHASE7DATA=C:\Users\chuck_6\OneDrive\Phase7Data"
 set "ANDROIDPROJ=C:\AndroidProjects\Phase7Residents"
 
 echo.
-echo [1/4] Running build_phase7_js.py ...
-cd /d "%PHASE7DATA%"
-python "%PHASE7DATA%\build_phase7_js.py"
-if errorlevel 1 (
-    echo !!!
-    echo !!! ERROR: build_phase7_js.py failed.
-    echo !!!
-    pause
-    exit /b 1
-)
-
-echo.
 echo [2/4] Copying web assets to Android project ...
+
 copy /Y "%PHASE7DATA%\phase7_merged_lots.js" "%ANDROIDPROJ%\app\src\main\assets\phase7_merged_lots.js"
 copy /Y "%PHASE7DATA%\index.html"              "%ANDROIDPROJ%\app\src\main\assets\index.html"
 copy /Y "%PHASE7DATA%\Phase7Org.png"           "%ANDROIDPROJ%\app\src\main\assets\Phase7Org.png"
 copy /Y "%PHASE7DATA%\season_name.txt"         "%ANDROIDPROJ%\app\src\main\assets\season_name.txt"
 copy /Y "%PHASE7DATA%\phase7_password.txt"     "%ANDROIDPROJ%\app\src\main\assets\phase7_password.txt"
 copy /Y "%PHASE7DATA%\mapped_sites.js"         "%ANDROIDPROJ%\app\src\main\assets\mapped_sites.js"
+
+REM NEW modular JS files:
+copy /Y "%PHASE7DATA%\events.js"               "%ANDROIDPROJ%\app\src\main\assets\events.js"
+copy /Y "%PHASE7DATA%\draw_sites.js"           "%ANDROIDPROJ%\app\src\main\assets\draw_sites.js"
+copy /Y "%PHASE7DATA%\event_engine.js"         "%ANDROIDPROJ%\app\src\main\assets\event_engine.js"
+copy /Y "%PHASE7DATA%\draw_lots.js"            "%ANDROIDPROJ%\app\src\main\assets\draw_lots.js"
+copy /Y "%PHASE7DATA%\map_core.js"             "%ANDROIDPROJ%\app\src\main\assets\map_core.js"
+copy /Y "%PHASE7DATA%\apk_info.js" "%ANDROIDPROJ%\app\src\main\assets\apk_info.js"
+copy /Y "%PHASE7DATA%\Phase7Residents.apk" "%ANDROIDPROJ%\app\src\main\assets\Phase7Residents.apk"
+
+
+
 if errorlevel 1 (
     echo !!!
     echo !!! ERROR: Copy to assets failed.
@@ -33,6 +34,7 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
+
 
 echo.
 echo [3/4] Running Gradle assembleDebug ...
