@@ -1,5 +1,5 @@
 // map_core.js
-// Core Phase 7 app logic: global state, season/password, popups, init.
+// Core Phase 7 app logic: state, popups, map init, APK button.
 
 let PASSWORD = "Rudolf122025";
 let currentSeasonName = "Holiday Season";
@@ -12,102 +12,94 @@ let canvas, ctx, mapImg, mapWrapper;
 // LOTS from phase7_merged_lots.js
 const LOTS = (typeof phaseResidentsData !== "undefined") ? phaseResidentsData : [];
 
-// ----------------------------------------------------------
-// Utility
-// ----------------------------------------------------------
-function getQueryParam(name) {
-  if (!window.location || !window.location.search) return null;
-  const params = new URLSearchParams(window.location.search);
-  return params.get(name);
-}
-
-// ----------------------------------------------------------
-// APK Label + Download Handler
-// ----------------------------------------------------------
-function updateApkButtonLabel() {
-  if (typeof APK_LAST_UPDATED === "undefined") return;
-
-  const btn = document.getElementById("apkDownloadButton");
-  if (!btn) return;
-
-  btn.textContent = "Download Android App (" + APK_LAST_UPDATED + ")";
-}
-
-// Apply immediately on script load (Android WebView-safe)
-updateApkButtonLabel();
-
-function handleAndroidDownloadClick() {
-  window.location.href = "Phase7Residents.apk";
-}
-window.handleAndroidDownloadClick = handleAndroidDownloadClick;
-
-// ----------------------------------------------------------
-// Season icon utilities
-// ----------------------------------------------------------
+// ------------------------
+// Season + lock UI
+// ------------------------
 function getSeasonIcon(name) {
   const lower = (name || "").toLowerCase();
-  if (lower.includes("halloween")) return "🎃";
-  if (lower.includes("christmas")) return "🎄";
-  if (lower.includes("holiday")) return "🎉";
-  if (lower.includes("light")) return "✨";
-  if (lower.includes("spring")) return "🌸";
-  if (lower.includes("summer")) return "☀️";
-  if (lower.includes("fall") || lower.includes("autumn")) return "🍂";
+  if (lower.indexOf("halloween") >= 0) return "🎃";
+  if (lower.indexOf("christmas") >= 0) return "🎄";
+  if (lower.indexOf("holiday") >= 0) return "🎉";
+  if (lower.indexOf("light") >= 0) return "✨";
+  if (lower.indexOf("spring") >= 0) return "🌸";
+  if (lower.indexOf("summer") >= 0) return "☀️";
+  if (lower.indexOf("fall") >= 0 || lower.indexOf("autumn") >= 0) return "🍂";
   return "⭐";
 }
 
 function updateSeasonToggleLabel() {
-  const labelSpan = document.getElementById("seasonOnlyLabel");
-  if (!labelSpan) return;
+  const span = document.getElementById("seasonOnlyLabel");
+  if (!span) return;
   const icon = getSeasonIcon(currentSeasonName);
-  labelSpan.textContent = icon + " " + currentSeasonName + " Only";
+  span.textContent = icon + " " + currentSeasonName + " Only";
 }
 
 function updateLockStatusUI() {
-  const lockStatus = document.getElementById("lockStatus");
-  if (!lockStatus) return;
-
-  if (!isUnlocked) {
-    lockStatus.textContent = "Season view only (privacy mode)";
-  } else {
-    lockStatus.textContent = "Full map unlocked (session only)";
-  }
+  const el = document.getElementById("lockStatus");
+  if (!el) return;
+  el.textContent = isUnlocked
+    ? "Full map unlocked (session only)"
+    : "Season view only (privacy mode)";
 }
 
-// ----------------------------------------------------------
-// Fetch season name + password (web only)
-// ----------------------------------------------------------
+// ------------------------
+// Fetch season + password (web only)
+// ------------------------
 function fetchSeasonName() {
   fetch("season_name.txt")
-    .then(r => r.text())
-    .then(text => {
+    .then(function (r) { return r.text(); })
+    .then(function (text) {
       const trimmed = text.trim();
-      if (trimmed) {
-        currentSeasonName = trimmed;
-      }
+      if (trimmed) currentSeasonName = trimmed;
       updateSeasonToggleLabel();
     })
-    .catch(() => {
+    .catch(function () {
       updateSeasonToggleLabel();
     });
 }
 
 function fetchPassword() {
   fetch("phase7_password.txt")
-    .then(r => r.text())
-    .then(text => {
+    .then(function (r) { return r.text(); })
+    .then(function (text) {
       const trimmed = text.trim();
       if (trimmed) PASSWORD = trimmed;
       console.log("Password loaded from file.");
     })
-    .catch(err => {
-      console.warn("Could not load phase7_password.txt, using default PASSWORD.", err);
+    .catch(function (err) {
+      console.warn("Could not load phase7_password.txt, using default.", err);
     });
 }
 
-// ----------------------------------------------------------
+// ------------------------
+// APK label + download
+// ------------------------
+function updateApkButtonLabel() {
+  if (typeof APK_LAST_UPDATED === "undefined") return;
+  const btn = document.getElementById("apkDownloadButton");
+  if (!btn) return;
+  btn.textContent = "Download Android App (" + APK_LAST_UPDATED + ")";
+}
+
+function handleAndroidDownloadClick() {
+  const isAsset =
+    window.location.protocol === "file:" &&
+    window.location.href.indexOf("/android_asset/") !== -1;
+
+  if (isAsset) {
+    // Inside Android app WebView: use public HTTPS URL for APK
+    window.location.href =
+      "https://chuckrushphase7.github.io/Phase7Data/Phase7Residents.apk";
+  } else {
+    // Web/PC: relative path next to index.html
+    window.location.href = "Phase7Residents.apk";
+  }
+}
+window.handleAndroidDownloadClick = handleAndroidDownloadClick;
+
+// ------------------------
 // Privacy panel
-// ----------------------------------------------------------
+// ------------------------
 function setupPrivacyPanel() {
   const btn = document.getElementById("privacyButton");
   const panel = document.getElementById("privacyPanel");
@@ -115,90 +107,132 @@ function setupPrivacyPanel() {
 
   if (!btn || !panel || !closeBtn) return;
 
-  btn.addEventListener("click", () => panel.classList.remove("hidden"));
-  closeBtn.addEventListener("click", () => panel.classList.add("hidden"));
+  btn.addEventListener("click", function () {
+    panel.classList.remove("hidden");
+  });
 
-  panel.addEventListener("click", (e) => {
+  closeBtn.addEventListener("click", function () {
+    panel.classList.add("hidden");
+  });
+
+  panel.addEventListener("click", function (e) {
     if (e.target === panel) panel.classList.add("hidden");
   });
 }
 
-// ----------------------------------------------------------
-// Lot popup builder
-// ----------------------------------------------------------
-function isSeasonStation(lot) {
-  return !!lot.isChristmasStation;
-}
-
-function getSeasonDetails(lot) {
-  return lot.christmasStationDetails || "";
-}
-
-function shouldShowLot(lot) {
-  if (isSeasonOnly && !isSeasonStation(lot)) return false;
-  return true;
-}
-
+// ------------------------
+// Lot popup helpers
+// (these use helpers from draw_lots.js: isSeasonStation, getSeasonDetails, shouldShowLot)
+// ------------------------
 function buildPopupContent(lot) {
   const seasonDetails = getSeasonDetails(lot);
 
-  // Privacy mode
+  // Locked view
   if (!isUnlocked) {
     if (isSeasonStation(lot)) {
-      return `
-        <div class="popup-inner">
-          <h3>${currentSeasonName} Station</h3>
-          ${seasonDetails ? `<p>${seasonDetails}</p>` : ""}
-          <button class="popup-close" onclick="hidePopup()">Close</button>
-        </div>
-      `;
+      return (
+        '<div class="popup-inner">' +
+        "<h3>" + currentSeasonName + " Station</h3>" +
+        (seasonDetails ? "<p>" + seasonDetails + "</p>" : "") +
+        '<button class="popup-close" onclick="hidePopup()">Close</button>' +
+        "</div>"
+      );
     }
-    return `
-      <div class="popup-inner">
-        <h3>${currentSeasonName} Map</h3>
-        <button class="popup-close" onclick="hidePopup()">Close</button>
-      </div>
-    `;
+    return (
+      '<div class="popup-inner">' +
+      "<h3>" + currentSeasonName + " Map</h3>" +
+      '<button class="popup-close" onclick="hidePopup()">Close</button>' +
+      "</div>"
+    );
   }
 
-  // Full details
-  const lines = [];
+  // Full details view
+  const parts = [];
 
-  lines.push(`<h3>Lot ${lot.lotNumber}</h3>`);
+  parts.push("<h3>Lot " + lot.lotNumber + "</h3>");
 
-  const pName = lot.primaryName || "";
-  const sName = lot.secondaryName || "";
+  var pName = lot.primaryName || "";
+  var sName = lot.secondaryName || "";
   if (pName) {
-    lines.push(`<p><strong>${sName ? `${pName} & ${sName}` : pName}</strong></p>`);
+    parts.push(
+      "<p><strong>" +
+      (sName ? (pName + " & " + sName) : pName) +
+      "</strong></p>"
+    );
   }
 
-  if (lot.address) lines.push(`<p>${lot.address}</p>`);
-  if (lot.homeTypeStyle) lines.push(`<p>Home: ${lot.homeTypeStyle}</p>`);
-  if (lot.contractStatus) lines.push(`<p>Status: ${lot.contractStatus}</p>`);
+  if (lot.address) parts.push("<p>" + lot.address + "</p>");
+  if (lot.homeTypeStyle) parts.push("<p>Home: " + lot.homeTypeStyle + "</p>");
+  if (lot.contractStatus) parts.push("<p>Status: " + lot.contractStatus + "</p>");
 
   if (lot.isSensitive) {
-    lines.push(`<p><em>Details limited for privacy.</em></p>`);
+    parts.push("<p><em>Details limited for privacy.</em></p>");
   } else {
-    if (lot.originCityState) lines.push(`<p>From: ${lot.originCityState}</p>`);
-    if (lot.phone) lines.push(`<p>Phone: ${lot.phone}</p>`);
-    if (lot.notes) lines.push(`<p>Notes: ${lot.notes}</p>`);
+    if (lot.originCityState) {
+      parts.push("<p>From: " + lot.originCityState + "</p>");
+    }
+    if (lot.phone) {
+      parts.push("<p>Phone: " + lot.phone + "</p>");
+    }
+    if (lot.notes) {
+      parts.push("<p>Notes: " + lot.notes + "</p>");
+    }
   }
 
   if (isSeasonStation(lot) && seasonDetails) {
-    lines.push(`<p><strong>${currentSeasonName} Station:</strong> ${seasonDetails}</p>`);
+    parts.push(
+      "<p><strong>" + currentSeasonName +
+      " Station:</strong> " + seasonDetails + "</p>"
+    );
   }
 
-  lines.push(`<button class="popup-close" onclick="hidePopup()">Close</button>`);
+  parts.push(
+    '<button class="popup-close" onclick="hidePopup()">Close</button>'
+  );
 
-  return `<div class="popup-inner">${lines.join("")}</div>`;
+  return '<div class="popup-inner">' + parts.join("") + "</div>";
 }
 
-// ----------------------------------------------------------
-// Popup display
-// ----------------------------------------------------------
-function showPopup(lot, cssX, cssY) {
+function hidePopup() {
   const popup = document.getElementById("lotPopup");
-  if (!popup || !mapWrapper || !canvas) return;
+  if (popup) popup.classList.add("hidden");
+}
+window.hidePopup = hidePopup;
+
+// ------------------------
+// Hit testing + tap handling
+// ------------------------
+function findLotAt(x, y) {
+  const threshold = 25;
+  const thresholdSq = threshold * threshold;
+  let best = null;
+  let bestDist = thresholdSq;
+
+  if (!Array.isArray(LOTS)) return null;
+
+  LOTS.forEach(function (lot) {
+    if (!shouldShowLot(lot)) return;
+
+    const lx = Number(lot.x);
+    const ly = Number(lot.y);
+    if (!Number.isFinite(lx) || !Number.isFinite(ly)) return;
+
+    const dx = x - lx;
+    const dy = y - ly;
+    const d2 = dx * dx + dy * dy;
+
+    if (d2 <= bestDist) {
+      bestDist = d2;
+      best = lot;
+    }
+  });
+
+  return best;
+}
+
+function showLotPopup(lot, clientX, clientY) {
+  const popup = document.getElementById("lotPopup");
+  if (!popup || !canvas || !mapWrapper) return;
 
   const wrapperRect = mapWrapper.getBoundingClientRect();
   const canvasRect = canvas.getBoundingClientRect();
@@ -209,8 +243,8 @@ function showPopup(lot, cssX, cssY) {
   const offsetX = canvasRect.left - wrapperRect.left;
   const offsetY = canvasRect.top - wrapperRect.top;
 
-  let left = cssX + offsetX + 12;
-  let top  = cssY + offsetY + 12;
+  let left = (clientX - canvasRect.left) + offsetX + 12;
+  let top  = (clientY - canvasRect.top)  + offsetY + 12;
 
   popup.style.left = left + "px";
   popup.style.top  = top  + "px";
@@ -224,76 +258,19 @@ function showPopup(lot, cssX, cssY) {
   const maxLeft = wrapperRect.width - popupRect.width - 8;
   const maxTop  = wrapperRect.height - popupRect.height - 8;
 
-  left = Math.max(8, Math.min(left, maxLeft));
-  top  = Math.max(8, Math.min(top, maxTop));
+  if (left < 8) left = 8;
+  if (left > maxLeft) left = maxLeft;
+  if (top < 8) top = 8;
+  if (top > maxTop) top = maxTop;
 
   popup.style.left = left + "px";
   popup.style.top  = top  + "px";
 }
 
-function hidePopup() {
-  const popup = document.getElementById("lotPopup");
-  if (popup) popup.classList.add("hidden");
-}
-window.hidePopup = hidePopup;
-
-// ----------------------------------------------------------
-// Hit testing
-// ----------------------------------------------------------
-function findLotAt(x, y) {
-  const thresholdSq = 25 * 25;
-  let best = null;
-  let bestDist = thresholdSq;
-
-  LOTS.forEach(lot => {
-    if (!shouldShowLot(lot)) return;
-
-    const lx = Number(lot.x);
-    const ly = Number(lot.y);
-    if (!Number.isFinite(lx) || !Number.isFinite(ly)) return;
-
-    const dx = x - lx;
-    const dy = y - ly;
-    const d2 = dx*dx + dy*dy;
-
-    if (d2 <= bestDist) {
-      bestDist = d2;
-      best = lot;
-    }
-  });
-
-  return best;
-}
-
-// ----------------------------------------------------------
-// Canvas events
-// ----------------------------------------------------------
-function handleCanvasTap(clientX, clientY) {
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-
-  const cx = (clientX - rect.left) * scaleX;
-  const cy = (clientY - rect.top)  * scaleY;
-
-  // Event hit
-  const ev = findEventAt(cx, cy);
-  if (ev) {
-    showEventPopup(ev, clientX, clientY);
-    return;
-  }
-
-  // Lot hit
-  const lot = findLotAt(cx, cy);
-  if (lot) {
-    showPopup(lot, clientX - rect.left, clientY - rect.top);
-  } else {
-    hidePopup();
-  }
-}
-
 function showEventPopup(ev, clientX, clientY) {
   const popup = document.getElementById("lotPopup");
+  if (!popup || !canvas || !mapWrapper) return;
+
   const wrapperRect = mapWrapper.getBoundingClientRect();
   const canvasRect = canvas.getBoundingClientRect();
 
@@ -308,29 +285,70 @@ function showEventPopup(ev, clientX, clientY) {
 
   popup.style.left = left + "px";
   popup.style.top  = top  + "px";
+
+  const popupRect = popup.getBoundingClientRect();
+
+  if (window.innerWidth <= 768) {
+    left = (wrapperRect.width - popupRect.width) / 2;
+  }
+
+  const maxLeft = wrapperRect.width - popupRect.width - 8;
+  const maxTop  = wrapperRect.height - popupRect.height - 8;
+
+  if (left < 8) left = 8;
+  if (left > maxLeft) left = maxLeft;
+  if (top < 8) top = 8;
+  if (top > maxTop) top = maxTop;
+
+  popup.style.left = left + "px";
+  popup.style.top  = top  + "px";
+}
+
+function handleCanvasTap(clientX, clientY) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  const cx = (clientX - rect.left) * scaleX;
+  const cy = (clientY - rect.top)  * scaleY;
+
+  // 1) Events
+  const ev = findEventAt(cx, cy);
+  if (ev) {
+    showEventPopup(ev, clientX, clientY);
+    return;
+  }
+
+  // 2) Lots
+  const lot = findLotAt(cx, cy);
+  if (lot) {
+    showLotPopup(lot, clientX, clientY);
+  } else {
+    hidePopup();
+  }
 }
 
 function setupCanvasEvents() {
-  canvas.addEventListener("click", (e) => {
+  canvas.addEventListener("click", function (e) {
     handleCanvasTap(e.clientX, e.clientY);
   });
 
-  canvas.addEventListener("touchend", (e) => {
-    if (e.changedTouches.length) {
+  canvas.addEventListener("touchend", function (e) {
+    if (e.changedTouches && e.changedTouches.length > 0) {
       const t = e.changedTouches[0];
       handleCanvasTap(t.clientX, t.clientY);
     }
   });
 }
 
-// ----------------------------------------------------------
+// ------------------------
 // Season-only toggle
-// ----------------------------------------------------------
+// ------------------------
 function setupSeasonToggle() {
   const checkbox = document.getElementById("seasonOnlyCheckbox");
   if (!checkbox) return;
 
-  checkbox.addEventListener("change", () => {
+  checkbox.addEventListener("change", function () {
     if (!isUnlocked && !checkbox.checked) {
       const entered = window.prompt("Enter password to unlock full map:");
       if (entered === PASSWORD) {
@@ -352,20 +370,18 @@ function setupSeasonToggle() {
   });
 }
 
-// ----------------------------------------------------------
-// Map initialization
-// ----------------------------------------------------------
+// ------------------------
+// Map init
+// ------------------------
 function initMap() {
   canvas = document.getElementById("mapCanvas");
   mapWrapper = document.getElementById("mapWrapper");
-
   if (!canvas || !mapWrapper) {
-    console.error("Canvas or mapWrapper missing.");
+    console.error("Canvas or mapWrapper not found in DOM.");
     return;
   }
 
   ctx = canvas.getContext("2d");
-
   mapImg = new Image();
   mapImg.src = "Phase7Org.png";
 
@@ -376,89 +392,19 @@ function initMap() {
     drawLots();
   };
 
-  mapImg.onerror = function (err) {
-    console.error("FAILED to load Phase7Org.png", err);
+  mapImg.onerror = function (e) {
+    console.error("FAILED to load map image Phase7Org.png", e);
   };
 
   setupCanvasEvents();
 }
 
-// ----------------------------------------------------------
-// Admin Panel (if ?admin=1)
-// ----------------------------------------------------------
-function setupAdminPanel() {
-  const adminFlag = getQueryParam("admin");
-  const panel = document.getElementById("admin-panel");
-  const summaryDiv = document.getElementById("admin-summary");
-  const textarea = document.getElementById("admin-events-json");
-
-  if (!panel || adminFlag !== "1") {
-    if (panel) panel.style.display = "none";
-    return;
-  }
-
-  panel.style.display = "block";
-
-  let rowsHtml = "";
-  let total = 0;
-  let visible = 0;
-
-  if (Array.isArray(window.EVENTS)) {
-    total = EVENTS.length;
-    visible = EVENTS.filter(ev => isEventVisible(ev)).length;
-
-    rowsHtml += `
-      <table style="width:100%; border-collapse: collapse; margin-top: 6px; font-size: 13px;">
-        <tr>
-          <th>ID</th>
-          <th>Type</th>
-          <th>Label</th>
-          <th>Location</th>
-          <th>Season</th>
-          <th>Visible?</th>
-        </tr>
-    `;
-
-    EVENTS.forEach(ev => {
-      const loc = ev.lotNumber
-        ? "Lot " + ev.lotNumber
-        : ev.siteId || "—";
-
-      const seasons = ev.seasons?.length ? ev.seasons.join(", ") : "All";
-
-      rowsHtml += `
-        <tr>
-          <td>${ev.id}</td>
-          <td>${ev.type}</td>
-          <td>${ev.label}</td>
-          <td>${loc}</td>
-          <td>${seasons}</td>
-          <td>${isEventVisible(ev) ? "Yes" : "No"}</td>
-        </tr>
-      `;
-    });
-
-    rowsHtml += "</table>";
-  }
-
-  if (summaryDiv) {
-    summaryDiv.innerHTML = `
-      <p><strong>Events:</strong> ${visible} visible / ${total} total</p>
-      ${rowsHtml}
-    `;
-  }
-
-  if (textarea && Array.isArray(window.EVENTS)) {
-    textarea.value = JSON.stringify(EVENTS, null, 2);
-  }
-}
-
-// ----------------------------------------------------------
+// ------------------------
 // Startup
-// ----------------------------------------------------------
+// ------------------------
 window.addEventListener("load", function () {
   updateLockStatusUI();
-  updateApkButtonLabel();     // <-- critical for Android
+  updateApkButtonLabel();
 
   const isWeb =
     window.location.protocol === "http:" ||
@@ -469,14 +415,10 @@ window.addEventListener("load", function () {
     fetchPassword();
   } else {
     updateSeasonToggleLabel();
-    console.warn("Running from file:// — skipping season/password fetch.");
+    console.warn("Running from file:// - skipping season/password fetch.");
   }
 
   setupPrivacyPanel();
   setupSeasonToggle();
   initMap();
-
-  if (typeof setupAdminPanel === "function") {
-    setupAdminPanel();
-  }
 });
