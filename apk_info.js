@@ -1,1 +1,1 @@
-const APK_LAST_UPDATED = "Wed 11/26/2025";
+const APK_LAST_UPDATED = "Thu 11/27/2025";
