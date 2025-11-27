@@ -82,20 +82,11 @@ function updateApkButtonLabel() {
 }
 
 function handleAndroidDownloadClick() {
-  const isAsset =
-    window.location.protocol === "file:" &&
-    window.location.href.indexOf("/android_asset/") !== -1;
-
-  if (isAsset) {
-    // Inside Android app WebView: use public HTTPS URL for APK
-    window.location.href =
-      "https://chuckrushphase7.github.io/Phase7Data/Phase7Residents.apk";
-  } else {
-    // Web/PC: relative path next to index.html
-    window.location.href = "Phase7Residents.apk";
-  }
+  // Always use the public GitHub Pages URL for the APK
+  window.location.href = "https://chuckrushphase7.github.io/Phase7Data/Phase7Residents.apk";
 }
 window.handleAndroidDownloadClick = handleAndroidDownloadClick;
+
 
 // ------------------------
 // Privacy panel
