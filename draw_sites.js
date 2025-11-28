@@ -37,6 +37,122 @@ function debugPolygonVertices(ctx, points) {
   });
 }
 
+// ------- special handling for Blue Guitar Park -------
+
+function getPolygonBounds(points) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const p of points) {
+    const x = p[0];
+    const y = p[1];
+    if (x < minX) minX = x;
+    if (y < minY) minY = y;
+    if (x > maxX) maxX = x;
+    if (y > maxY) maxY = y;
+  }
+  return { minX, minY, maxX, maxY };
+}
+
+// MAPPED_SITES uses siteId: "BlueGuitarPark" for this polygon.
+function isBlueGuitarPark(site) {
+  return !!site && site.siteId === "BlueGuitarPark";
+}
+
+function drawGuitarIcon(ctx, x, y) {
+  ctx.save();
+
+  // Guitar body (two ellipses)
+  ctx.beginPath();
+  ctx.ellipse(x, y + 6, 22, 18, 0, 0, Math.PI * 2);
+  ctx.ellipse(x, y - 10, 16, 12, 0, 0, Math.PI * 2);
+  ctx.fillStyle = "#f59e0b"; // warm orange
+  ctx.fill();
+  ctx.strokeStyle = "#92400e";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Sound hole
+  ctx.beginPath();
+  ctx.arc(x, y - 4, 4, 0, Math.PI * 2);
+  ctx.fillStyle = "#111827";
+  ctx.fill();
+
+  // Neck
+  ctx.beginPath();
+  ctx.moveTo(x - 4, y - 26);
+  ctx.lineTo(x + 4, y - 26);
+  ctx.lineTo(x + 4, y - 42);
+  ctx.lineTo(x - 4, y - 42);
+  ctx.closePath();
+  ctx.fillStyle = "#78350f";
+  ctx.fill();
+
+  // Strings
+  ctx.strokeStyle = "#f9fafb";
+  ctx.lineWidth = 0.6;
+  for (let i = -2; i <= 2; i++) {
+    ctx.beginPath();
+    ctx.moveTo(x + i, y - 40);
+    ctx.lineTo(x + i, y + 14);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+function drawBlueGuitarPark(ctx, points) {
+  const ordered = orderPolygonPoints(points);
+  if (!ordered || ordered.length < 3) return;
+
+  const bounds = getPolygonBounds(ordered);
+
+  ctx.save();
+
+  // Path
+  ctx.beginPath();
+  ctx.moveTo(ordered[0][0], ordered[0][1]);
+  for (let i = 1; i < ordered.length; i++) {
+    ctx.lineTo(ordered[i][0], ordered[i][1]);
+  }
+  ctx.closePath();
+
+  // Blue gradient fill
+  const grad = ctx.createLinearGradient(
+    bounds.minX,
+    bounds.minY,
+    bounds.maxX,
+    bounds.maxY
+  );
+  grad.addColorStop(0, "#bfdbfe");
+  grad.addColorStop(1, "#1e40af");
+
+  ctx.fillStyle = grad;
+  ctx.strokeStyle = "rgba(15,23,42,0.9)";
+  ctx.lineWidth = 2;
+
+  ctx.fill();
+  ctx.stroke();
+
+  // Centered guitar icon
+  const centerX = (bounds.minX + bounds.maxX) / 2;
+  const centerY = (bounds.minY + bounds.maxY) / 2;
+  drawGuitarIcon(ctx, centerX, centerY);
+
+  // Label above park
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "bold 14px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillText("Blue Guitar Park", centerX, bounds.minY - 4);
+
+  if (DEBUG_POLYGONS) {
+    debugPolygonVertices(ctx, ordered);
+  }
+
+  ctx.restore();
+}
+
+// ------- generic polygon drawing -------
+
 function drawPolygon(ctx, points, type) {
   if (!points || points.length < 3) return;
 
@@ -69,10 +185,19 @@ function drawPolygon(ctx, points, type) {
   }
 }
 
+function drawSite(ctx, site) {
+  if (!site || !site.polygon) return;
+
+  if (isBlueGuitarPark(site)) {
+    drawBlueGuitarPark(ctx, site.polygon);
+  } else {
+    drawPolygon(ctx, site.polygon, site.type);
+  }
+}
+
 function drawAllMappedSites(ctx) {
   if (typeof MAPPED_SITES === "undefined" || !Array.isArray(MAPPED_SITES)) return;
   MAPPED_SITES.forEach(site => {
-    if (!site.polygon) return;
-    drawPolygon(ctx, site.polygon, site.type);
+    drawSite(ctx, site);
   });
 }
