@@ -5,6 +5,15 @@
   <title>Phase 7 Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Detect Android WebView mode early to avoid flicker -->
+  <script>
+    (function () {
+      if (window.location.search.indexOf("android=1") !== -1) {
+        document.documentElement.classList.add("android-app");
+      }
+    })();
+  </script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -29,7 +38,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 12px;
+      padding: 6px 10px;
       background: #111827;
       color: #f9fafb;
       margin-top: 4px;
@@ -99,7 +108,6 @@
       display: block;
       max-width: 100%;
       height: auto;
-
     }
 
     /* Download bar */
@@ -203,6 +211,37 @@
       padding: 4px 10px;
       font-size: 0.85rem;
     }
+    /* Sprite overlay for animated icons (gator, etc.) */
+    /* Sprite overlay for animated icons (gator, etc.) */
+    #spriteLayer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none; /* clicks go through to the canvas */
+    }
+
+    /* Animated alligator sprite */
+    .alligator-sprite {
+      position: absolute;
+      font-size: 32px;
+      line-height: 1;
+      transform: translate(-50%, -50%);
+      animation: gatorBob 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes gatorBob {
+      0% {
+        transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translate(-50%, -50%) translateY(-4px) rotate(-4deg);
+      }
+      100% {
+        transform: translate(-50%, -50%) translateY(4px) rotate(4deg);
+      }
+    }
+
+
+
 
     footer {
       padding: 6px 10px;
@@ -210,27 +249,93 @@
       text-align: center;
       color: #6b7280;
     }
+
+    /* ---------- ANDROID APP LAYOUT TWEAKS ---------- */
+    .android-app #download-bar,
+    .android-app #android-instructions,
+    .android-app #ios-instructions {
+      display: none !important;
+    }
+	/* Sprite overlay for animated icons */
+#spriteLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* clicks still go to the canvas */
+}
+
+/* Animated alligator sprite */
+.alligator-sprite {
+  position: absolute;
+  font-size: 32px;
+  line-height: 1;
+  /* We'll center it exactly on the event coordinates */
+  transform: translate(-50%, -50%);
+  animation: gatorBob 2.4s ease-in-out infinite alternate;
+}
+
+/* Little bob + wiggle */
+@keyframes gatorBob {
+  0% {
+    transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-4px) rotate(-4deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(4px) rotate(4deg);
+  }
+}
+/* Sprite overlay for animated icons (e.g., gator) */
+#spriteLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* clicks still go to canvas */
+}
+
+/* Animated alligator sprite (emoji-based) */
+.alligator-sprite {
+  position: absolute;
+  font-size: 32px;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  animation: gatorBob 2.4s ease-in-out infinite alternate;
+}
+
+/* Simple bob + wiggle */
+@keyframes gatorBob {
+  0% {
+    transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-4px) rotate(-4deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(4px) rotate(4deg);
+  }
+}
+
+
   </style>
 </head>
 
 <body>
   <header class="top-bar">
     <div class="app-title">
-      Phase 7 Neighborhood Map
+      <!-- Title removed here to avoid repetition in the app UI -->
     </div>
     <div class="top-bar-right">
       <span id="lockStatus" class="status-text">
-        Season view only (privacy mode)
+        Seasonal
       </span>
       <label class="season-toggle">
         <input type="checkbox" id="seasonOnlyCheckbox" checked />
-        <span id="seasonOnlyLabel">Season Only</span>
+        <span id="seasonOnlyLabel">Residents</span>
       </label>
       <button id="privacyButton" class="link-button">Privacy</button>
     </div>
   </header>
 
-  <!-- Download buttons -->
+  <!-- Download buttons (hidden in Android app via .android-app class) -->
   <div id="download-bar">
     <button
       id="apkDownloadButton"
@@ -264,12 +369,37 @@
   </div>
 
   <main>
-    <div class="map-wrapper" id="mapWrapper">
-      <canvas id="mapCanvas"></canvas>
-      <div id="lotPopup" class="hidden"></div>
-    </div>
+<main>
+<main>
+<main>
+<main>
+<main>
+  <div class="map-wrapper" id="mapWrapper">
+    <canvas id="mapCanvas"></canvas>
+    <div id="lotPopup" class="hidden"></div>
 
-    <!-- Android install instructions -->
+    <!-- Overlay layer for animated sprites like the gator -->
+    <div id="spriteLayer"></div>
+  </div>
+
+  <!-- Android install instructions -->
+  <section id="android-instructions" ...
+
+  ...
+</main>
+
+  ...
+</main>
+
+
+  <!-- Android install instructions -->
+  <section id="android-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+    ...
+
+  ...
+</main>
+
+    <!-- Android install instructions (hidden in Android app) -->
     <section id="android-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
       <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">
         Installing the Android App
@@ -294,6 +424,7 @@
       </p>
     </section>
 
+    <!-- iOS instructions (hidden in Android app) -->
     <section id="ios-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
       <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">
         Using Phase 7 on iPhone / iPad
@@ -315,25 +446,26 @@
       </p>
     </section>
   </main>
-    <!-- Admin / Debug Panel (visible with ?admin=1) -->
-    <section id="admin-panel" style="display:none; margin: 20px auto; max-width: 800px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
-      <h2 style="font-size: 1.05rem; margin-bottom: 8px; text-align: center;">
-        Admin / Debug View
-      </h2>
-      <p style="font-size: 0.85rem; color: #555; text-align: center;">
-        This panel appears only when the URL includes <code>?admin=1</code>.
-      </p>
 
-      <div id="admin-summary" style="font-size: 0.85rem; margin-bottom: 10px;"></div>
+  <!-- Admin / Debug Panel (visible with ?admin=1) -->
+  <section id="admin-panel" style="display:none; margin: 20px auto; max-width: 800px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+    <h2 style="font-size: 1.05rem; margin-bottom: 8px; text-align: center;">
+      Admin / Debug View
+    </h2>
+    <p style="font-size: 0.85rem; color: #555; text-align: center;">
+      This panel appears only when the URL includes <code>?admin=1</code>.
+    </p>
 
-      <label for="admin-events-json" style="font-size: 0.8rem; font-weight: 600; display:block; margin: 8px 0 4px;">
-        EVENTS JSON (read-only)
-      </label>
-      <textarea
-        id="admin-events-json"
-        readonly
-        style="width: 100%; height: 220px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 0.8rem; padding: 6px; border-radius: 4px; border: 1px solid #d1d5db; background: #f9fafb;"></textarea>
-    </section>
+    <div id="admin-summary" style="font-size: 0.85rem; margin-bottom: 10px;"></div>
+
+    <label for="admin-events-json" style="font-size: 0.8rem; font-weight: 600; display:block; margin: 8px 0 4px;">
+      EVENTS JSON (read-only)
+    </label>
+    <textarea
+      id="admin-events-json"
+      readonly
+      style="width: 100%; height: 220px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 0.8rem; padding: 6px; border-radius: 4px; border: 1px solid #d1d5db; background: #f9fafb;"></textarea>
+  </section>
 
   <footer>
     This map is for Phase 7 residents. Seasonal view hides personal information by default.
