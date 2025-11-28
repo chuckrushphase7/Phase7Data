@@ -75,8 +75,56 @@ function getEventCoordinates(ev) {
   return null;
 }
 
+// ---------- animated gator sprite overlay ----------
+
+function updateAlligatorSprite(pos) {
+  const layer    = document.getElementById("spriteLayer");
+  const canvasEl = document.getElementById("mapCanvas");
+  if (!layer || !canvasEl) return;
+
+  let sprite = document.getElementById("alligatorSprite");
+
+  // No visible gator → remove sprite if it exists
+  if (!pos) {
+    if (sprite && sprite.parentNode) {
+      sprite.parentNode.removeChild(sprite);
+    }
+    return;
+  }
+
+  // Create sprite if needed
+  if (!sprite) {
+    sprite = document.createElement("div");
+    sprite.id = "alligatorSprite";
+    sprite.className = "alligator-sprite";
+    sprite.textContent = "🐊";
+    layer.appendChild(sprite);
+  }
+
+  // Map from canvas coordinates → on-screen coordinates
+  const rect   = canvasEl.getBoundingClientRect();
+  const scaleX = rect.width  / canvasEl.width;
+  const scaleY = rect.height / canvasEl.height;
+
+  const screenX = pos.x * scaleX;
+  const screenY = pos.y * scaleY;
+
+  // Scale gator size with the map
+  const baseSize = 28; // size when map is full 1500px wide
+  const scale    = rect.width / canvasEl.width; // 0–1 on smaller screens
+  const sizePx   = Math.max(16, baseSize * scale); // don't get too tiny
+
+  sprite.style.fontSize = sizePx + "px";
+
+  sprite.style.left = screenX + "px";
+  sprite.style.top  = screenY + "px";
+}
+
+
 function drawEvents(ctx) {
   if (!Array.isArray(EVENTS)) return;
+
+  let alligatorPos = null;
 
   EVENTS.forEach(ev => {
     if (!isEventVisible(ev)) return;
@@ -89,6 +137,11 @@ function drawEvents(ctx) {
 
     const { x, y } = coords;
     const icon = getEventIcon(ev);
+
+    // Remember gator position so we can place the sprite
+    if (ev.type === "alligator") {
+      alligatorPos = { x, y };
+    }
 
     const haloRadius = 14;
     const dotRadius = 6;
@@ -105,12 +158,18 @@ function drawEvents(ctx) {
     ctx.fillStyle = "#f97316"; // orange highlight
     ctx.fill();
 
-    // Icon above the dot
+    // Icon above the dot (skip for gator: sprite handles it)
     ctx.font = "22px system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(icon, x, y - 20);
+
+    if (ev.type !== "alligator") {
+      ctx.fillText(icon, x, y - 20);
+    }
   });
+
+  // Place / remove animated gator sprite
+  updateAlligatorSprite(alligatorPos);
 }
 
 function shouldShowSnowOverlay() {
