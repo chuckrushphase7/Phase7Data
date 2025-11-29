@@ -238,7 +238,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Irish Crème shots and mini-pumpkin chocolate chip cookies  -  Debra Nash"
+    "christmasStationDetails": "Irish Cr\u00e8me shots and mini-pumpkin chocolate chip cookies  -  Debra & Rick Nash / Tim and Cathy Brophy"
   },
   {
     "phaseNumber": 7,
@@ -7704,13 +7704,3 @@ const phaseResidentsData = [
     "christmasStationDetails": null
   }
 ];
-
-// Expose for browser usage
-if (typeof window !== 'undefined') {
-  window.phaseResidentsData = phaseResidentsData;
-}
-
-// Export for Node/testing (optional)
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = phaseResidentsData;
-}
