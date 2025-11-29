@@ -58,7 +58,7 @@ const phaseResidentsData = [
     "lotNumber": 1700,
     "homeTypeStyle": "Beach, Coconut",
     "contractStatus": "UC",
-    "primaryName": "Test Owner",
+    "primaryName": null,
     "secondaryName": null,
     "originCityState": null,
     "address": "181 Fins Up Ct.",
