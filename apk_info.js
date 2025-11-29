@@ -1,1 +1,3 @@
-const APK_LAST_UPDATED = "Fri 11/28/2025";
+// AUTO-GENERATED FILE — DO NOT EDIT
+// Last build date for Phase7Residents.apk
+const APK_LAST_UPDATED = "Sat 11/29/2025";
