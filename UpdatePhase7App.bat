@@ -3,29 +3,18 @@ echo Phase 7 App - Build Data and Debug APK
 echo ================================================
 
 REM --- Set common paths ---
-set "PHASE7DATA=C:\Users\chuck_6\OneDrive\Phase7Data"
+set "PHASE7DATA=C:\GitRepos\Phase7Data"
 set "ANDROIDPROJ=C:\AndroidProjects\Phase7Residents"
+REM Optional: where you like to grab the APK for devices
+set "ONEDRIVE_PHASE7=C:\Users\chuck_6\OneDrive\Phase7Data"
 
 echo.
 echo [1/4] Regenerating phase7_merged_lots.js from CSV ...
 
-REM Make sure the Python generator script exists
-if not exist "%PHASE7DATA%\generate_phase7_merged_lots.py" (
-    echo *** ERROR: generate_phase7_merged_lots.py not found in %PHASE7DATA%
-    echo Make sure you saved the Python script into this folder:
-    echo   %PHASE7DATA%
-    echo and named it exactly: generate_phase7_merged_lots.py
-    pause
-    goto :EOF
-)
-
 pushd "%PHASE7DATA%"
 python "%PHASE7DATA%\generate_phase7_merged_lots.py"
 if errorlevel 1 (
-    echo *** ERROR: Failed to run Python generator.
-    echo This usually means:
-    echo   - Python is not installed or 'python' is not in PATH, or
-    echo   - The script hit an error while reading Phase7Residents_with_coords.csv
+    echo *** ERROR: Failed to generate phase7_merged_lots.js
     pause
     popd
     goto :EOF
@@ -64,7 +53,11 @@ echo.
 echo [4/4] Copying APK and updating apk_info.js ...
 
 IF EXIST "%ANDROIDPROJ%\app\build\outputs\apk\debug\app-debug.apk" (
+    REM Main copy: into Git repo folder
     copy /Y "%ANDROIDPROJ%\app\build\outputs\apk\debug\app-debug.apk" "%PHASE7DATA%\Phase7Residents.apk"
+
+    REM Optional extra copy: into OneDrive folder you like to grab from
+    copy /Y "%ANDROIDPROJ%\app\build\outputs\apk\debug\app-debug.apk" "%ONEDRIVE_PHASE7%\Phase7Residents.apk"
 
     REM Overwrite apk_info.js with the new build date
     >"%PHASE7DATA%\apk_info.js" echo // AUTO-GENERATED FILE — DO NOT EDIT
@@ -80,7 +73,8 @@ IF EXIST "%ANDROIDPROJ%\app\build\outputs\apk\debug\app-debug.apk" (
 
 echo.
 echo Build complete.
-echo   Android APK: %PHASE7DATA%\Phase7Residents.apk
-echo   APK info   : %PHASE7DATA%\apk_info.js
+echo   Android APK (repo):     %PHASE7DATA%\Phase7Residents.apk
+echo   Android APK (OneDrive): %ONEDRIVE_PHASE7%\Phase7Residents.apk
+echo   APK info   :            %PHASE7DATA%\apk_info.js
 echo.
 pause
