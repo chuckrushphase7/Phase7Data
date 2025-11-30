@@ -133,15 +133,23 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
       white-space: normal;
+	      /* NEW: prevent popup from going off-screen */
+    bottom: auto;
+    top: auto;
+    margin: 10px;           /* keeps it from touching screen edges */
+    box-sizing: border-box; /* ensures padding isn't added outside */
     }
 
-    @media (max-width: 768px) {
-      #lotPopup {
-        max-width: 60vw;
-        font-size: 0.7rem;
-        padding: 4px 6px;
-      }
-    }
+@media (max-width: 800px) {
+  #lotPopup {
+    left: 50% !important;
+    top: 20% !important;
+    transform: translateX(-50%);
+    max-width: 90vw;
+    max-height: 70vh;
+  }
+}
+
 
     #lotPopup.hidden {
       display: none;
