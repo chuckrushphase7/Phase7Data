@@ -116,14 +116,14 @@
       text-align: center;
     }
 
-    /* Popup card – improved layout for long text */
+     /* Popup card – upgraded layout + animation */
     #lotPopup {
       position: absolute;
       background: #ffffff;
       border-radius: 10px;
       border: 1px solid #d1d5db;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-      padding: 10px 12px 8px 12px;
+      padding: 10px 12px;
       font-size: 0.8rem;
       z-index: 500;
 
@@ -134,31 +134,43 @@
       overflow-wrap: break-word;
       white-space: normal;
       box-sizing: border-box;
+
+      /* animation base state */
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.18s ease-out, transform 0.18s ease-out;
     }
 
-    /* Hide when JS toggles .hidden */
+    /* When JS adds .visible, fade/slide in */
+    #lotPopup.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Hidden state for compatibility with existing JS */
     #lotPopup.hidden {
       display: none;
     }
 
-    /* Title inside popup (your JS already uses <h3>…</h3>) */
+    /* Title inside popup (<h3> from buildPopupContent) */
     #lotPopup h3 {
       margin: 0 0 6px 0;
       font-size: 0.9rem;
       font-weight: 600;
     }
 
-    /* Optional inner wrapper if present */
-    #lotPopup .popup-inner {
-      margin-top: 4px;
+    /* Inner content wrapper (you already output <div class="popup-inner">) */
+    .popup-inner {
+      margin-top: 2px;
     }
 
-    #lotPopup .popup-inner p {
+    .popup-inner p {
       margin: 2px 0;
     }
 
-    /* Close button styling */
-    #lotPopup .popup-close,
+    /* Close button at bottom */
     .popup-close {
       margin-top: 8px;
       font-size: 0.75rem;
@@ -168,16 +180,33 @@
       background: #f3f4f6;
     }
 
-    /* Mobile: center popup and keep it fully on-screen */
+    .popup-close:hover {
+      background: #e5e7eb;
+    }
+
+    /* Mobile: center popup & keep it fully on-screen */
     @media (max-width: 800px) {
       #lotPopup {
         left: 50% !important;
         top: 18% !important;
-        transform: translateX(-50%);
+        transform: translateX(-50%) translateY(8px);
         max-width: 92vw;
         max-height: 70vh;
       }
+
+      #lotPopup.visible {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      #lotPopup {
+        font-size: 0.78rem;
+      }
+
+      #lotPopup h3 {
+        font-size: 0.85rem;
+      }
     }
+
 
 
 

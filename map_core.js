@@ -186,9 +186,12 @@ function buildPopupContent(lot) {
 
 function hidePopup() {
   const popup = document.getElementById("lotPopup");
-  if (popup) popup.classList.add("hidden");
+  if (!popup) return;
+  popup.classList.add("hidden");
+  popup.classList.remove("visible");
 }
 window.hidePopup = hidePopup;
+
 
 // ------------------------
 // Hit testing + tap handling
@@ -228,8 +231,9 @@ function showLotPopup(lot, clientX, clientY) {
   const wrapperRect = mapWrapper.getBoundingClientRect();
   const canvasRect = canvas.getBoundingClientRect();
 
-  popup.innerHTML = buildPopupContent(lot);
+   popup.innerHTML = buildPopupContent(lot);
   popup.classList.remove("hidden");
+  popup.classList.add("visible");
 
   const offsetX = canvasRect.left - wrapperRect.left;
   const offsetY = canvasRect.top - wrapperRect.top;
@@ -267,6 +271,8 @@ function showEventPopup(ev, clientX, clientY) {
 
   popup.innerHTML = buildEventPopupContent(ev);
   popup.classList.remove("hidden");
+  popup.classList.add("visible");
+    const offsetX = canvasRect.left - wrapperRect.left;
 
   const offsetX = canvasRect.left - wrapperRect.left;
   const offsetY = canvasRect.top - wrapperRect.top;
