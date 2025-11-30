@@ -1,3 +1,4 @@
-// AUTO-GENERATED FILE — DO NOT EDIT
-// Last build date for Phase7Residents.apk
-const APK_LAST_UPDATED = "Sun 11/30/2025 16:43:57.30";
+const apkInfo = { 
+  buildDate: "Sun 11/30/2025 16:53:56.67", 
+  tag: "v1.0.0" 
+}; 
