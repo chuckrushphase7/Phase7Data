@@ -1,575 +1,495 @@
-// map_core.js
-// Core Phase 7 app logic: state, popups, map init, APK button.
-
-let PASSWORD = "Rudolf122025";
-let currentSeasonName = "Holiday Season";
-
-let isSeasonOnly = true;
-let isUnlocked = false;
-
-let canvas, ctx, mapImg, mapWrapper;
-
-// LOTS from phase7_merged_lots.js
-const LOTS = (typeof phaseResidentsData !== "undefined") ? phaseResidentsData : [];
-
-// ------------------------
-// Season / lock UI
-// ------------------------
-function updateLockStatusUI() {
-  const el = document.getElementById("lockStatus");
-  if (!el) return;
-  el.textContent = isUnlocked
-    ? "Full map unlocked (session only)"
-    : "Season view only (privacy mode)";
-}
-
-// ------------------------
-// Fetch season + password (web only)
-// ------------------------
-function fetchSeasonName() {
-  fetch("season_name.txt")
-    .then(function (r) { return r.text(); })
-    .then(function (text) {
-      const trimmed = text.trim();
-      if (trimmed) currentSeasonName = trimmed;
-    })
-    .catch(function (err) {
-      console.warn("Could not load season_name.txt, using default.", err);
-    });
-}
-
-function fetchPassword() {
-  fetch("phase7_password.txt")
-    .then(function (r) { return r.text(); })
-    .then(function (text) {
-      const trimmed = text.trim();
-      if (trimmed) PASSWORD = trimmed;
-    })
-    .catch(function (err) {
-      console.warn("Could not load phase7_password.txt, using default.", err);
-    });
-}
-
-// ------------------------
-// APK label + download
-// ------------------------
-function updateApkButtonLabel() {
-  if (typeof APK_LAST_UPDATED === "undefined") return;
-  const btn = document.getElementById("apkDownloadButton");
-  if (!btn) return;
-  btn.textContent = "Download Android App (" + APK_LAST_UPDATED + ")";
-}
-
-function handleAndroidDownloadClick() {
-  // Always use the public GitHub Pages URL for the APK
-  window.location.href = "https://chuckrushphase7.github.io/Phase7Data/Phase7Residents.apk";
-}
-window.handleAndroidDownloadClick = handleAndroidDownloadClick;
-
-// ------------------------
-// Privacy panel
-// ------------------------
-function setupPrivacyPanel() {
-  const btn = document.getElementById("privacyButton");
-  const panel = document.getElementById("privacyPanel");
-  const closeBtn = document.getElementById("privacyCloseButton");
-
-  if (!btn || !panel || !closeBtn) return;
-
-  btn.addEventListener("click", function () {
-    panel.classList.remove("hidden");
-  });
-
-  closeBtn.addEventListener("click", function () {
-    panel.classList.add("hidden");
-  });
-
-  panel.addEventListener("click", function (e) {
-    if (e.target === panel) panel.classList.add("hidden");
-  });
-}
-
-// ------------------------
-// Season filtering helpers
-// ------------------------
-function isSeasonStation(lotOrEvent) {
-  return !!lotOrEvent && !!lotOrEvent.seasonStation;
-}
-
-function getSeasonDetails(lotOrEvent) {
-  return lotOrEvent && lotOrEvent.seasonDetails
-    ? lotOrEvent.seasonDetails
-    : "";
-}
-
-// Determine if this lot should be shown for the current view state
-function shouldShowLot(lot) {
-  if (!lot) return false;
-
-  // Hide entirely if flagged not visible
-  if (lot.hideOnMap) return false;
-
-  if (!isUnlocked) {
-    // In locked mode:
-    // - If Season Only, only show season stations.
-    // - If not, still show all lots for geometry.
-    return isSeasonOnly ? isSeasonStation(lot) : true;
-  }
-
-  // Unlocked view:
-  if (isSeasonOnly) {
-    return isSeasonStation(lot);
-  }
-
-  // Full mode: show everything that's not explicitly hidden
-  return true;
-}
-
-// ------------------------
-// Map + drawing
-// ------------------------
-function initCanvasAndImage() {
-  canvas = document.getElementById("mapCanvas");
-  mapWrapper = document.getElementById("mapWrapper");
-
-  if (!canvas || !mapWrapper) {
-    console.error("Canvas or mapWrapper not found in DOM.");
-    return false;
-  }
-
-  ctx = canvas.getContext("2d");
-  mapImg = new Image();
-  mapImg.src = "Phase7Org.png";
-
-  mapImg.onload = function () {
-    console.log("Map image loaded:", mapImg.width, "x", mapImg.height);
-    redrawMap();
-  };
-
-  mapImg.onerror = function (err) {
-    console.error("Failed to load Phase7Org.png", err);
-  };
-
-  return true;
-}
-
-function resizeCanvasToWrapper() {
-  if (!canvas || !mapWrapper) return;
-  const rect = mapWrapper.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-}
-
-function drawMapBase() {
-  if (!ctx || !mapImg) return;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const imgW = mapImg.width;
-  const imgH = mapImg.height;
-  const canvasW = canvas.width;
-  const canvasH = canvas.height;
-
-  if (!imgW || !imgH || !canvasW || !canvasH) return;
-
-  const imgAspect = imgW / imgH;
-  const canvasAspect = canvasW / canvasH;
-
-  let drawW, drawH, offsetX, offsetY;
-
-  if (imgAspect > canvasAspect) {
-    drawW = canvasW;
-    drawH = canvasW / imgAspect;
-    offsetX = 0;
-    offsetY = (canvasH - drawH) / 2;
-  } else {
-    drawH = canvasH;
-    drawW = canvasH * imgAspect;
-    offsetX = (canvasW - drawW) / 2;
-    offsetY = 0;
-  }
-
-  ctx.drawImage(mapImg, offsetX, offsetY, drawW, drawH);
-}
-
-function lotToCanvasCoords(lot) {
-  if (!lot || !canvas || !mapImg) return null;
-
-  const imgW = mapImg.width;
-  const imgH = mapImg.height;
-  const canvasW = canvas.width;
-  const canvasH = canvas.height;
-
-  if (!imgW || !imgH || !canvasW || !canvasH) return null;
-
-  const imgAspect = imgW / imgH;
-  const canvasAspect = canvasW / canvasH;
-
-  let drawW, drawH, offsetX, offsetY;
-  if (imgAspect > canvasAspect) {
-    drawW = canvasW;
-    drawH = canvasW / imgAspect;
-    offsetX = 0;
-    offsetY = (canvasH - drawH) / 2;
-  } else {
-    drawH = canvasH;
-    drawW = canvasH * imgAspect;
-    offsetX = (canvasW - drawW) / 2;
-    offsetY = 0;
-  }
-
-  const nx = Number(lot.mapX || lot.x) / 1000;
-  const ny = Number(lot.mapY || lot.y) / 1000;
-
-  return {
-    x: offsetX + nx * drawW,
-    y: offsetY + ny * drawH
-  };
-}
-
-function drawLots() {
-  if (!ctx || !Array.isArray(LOTS)) return;
-
-  ctx.save();
-  LOTS.forEach(function (lot) {
-    if (!shouldShowLot(lot)) return;
-
-    const coords = lotToCanvasCoords(lot);
-    if (!coords) return;
-
-    const r = isSeasonStation(lot) ? 6 : 3;
-    const color = isSeasonStation(lot) ? "#ff6600" : "#0080ff";
-
-    ctx.beginPath();
-    ctx.arc(coords.x, coords.y, r, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-  });
-  ctx.restore();
-}
-
-// ------------------------
-// Popup content builders
-// ------------------------
-function getSeasonIcon(name) {
-  const lower = (name || "").toLowerCase();
-  if (lower.indexOf("holiday") !== -1) return "🎄";
-  if (lower.indexOf("halloween") !== -1) return "🎃";
-  if (lower.indexOf("summer") !== -1) return "☀️";
-  return "⭐";
-}
-
-function buildEventPopupContent(ev) {
-  const parts = [];
-
-  const title = ev.title || (currentSeasonName + " Station");
-  const icon = getSeasonIcon(currentSeasonName);
-
-  parts.push("<h3>" + icon + " " + title + "</h3>");
-
-  if (ev.description) {
-    parts.push("<p>" + ev.description + "</p>");
-  }
-
-  if (ev.host) {
-    parts.push("<p><strong>Hosts:</strong> " + ev.host + "</p>");
-  }
-
-  if (ev.time) {
-    parts.push("<p><strong>Time:</strong> " + ev.time + "</p>");
-  }
-
-  parts.push(
-    '<button class="popup-close" onclick="hidePopup()">Close</button>'
-  );
-
-  return '<div class="popup-inner">' + parts.join("") + "</div>";
-}
-
-function buildPopupContent(lot) {
-  const seasonDetails = getSeasonDetails(lot);
-
-  // Locked view
-  if (!isUnlocked) {
-    if (isSeasonStation(lot)) {
-      return (
-        '<div class="popup-inner">' +
-        "<h3>" + currentSeasonName + " Station</h3>" +
-        (seasonDetails ? "<p>" + seasonDetails + "</p>" : "") +
-        '<button class="popup-close" onclick="hidePopup()">Close</button>' +
-        "</div>"
-      );
-    }
-    return (
-      '<div class="popup-inner">' +
-      "<h3>" + currentSeasonName + " Map</h3>" +
-      '<button class="popup-close" onclick="hidePopup()">Close</button>' +
-      "</div>"
-    );
-  }
-
-  // Full details view
-  const parts = [];
-
-  parts.push("<h3>Lot " + lot.lotNumber + "</h3>");
-
-  var pName = lot.primaryName || "";
-  var sName = lot.secondaryName || "";
-  if (pName) {
-    parts.push(
-      "<p><strong>" +
-      (sName ? (pName + " & " + sName) : pName) +
-      "</strong></p>"
-    );
-  }
-
-  if (lot.address) parts.push("<p>" + lot.address + "</p>");
-  if (lot.homeTypeStyle) parts.push("<p>Home: " + lot.homeTypeStyle + "</p>");
-  if (lot.contractStatus) parts.push("<p>Status: " + lot.contractStatus + "</p>");
-
-  if (lot.isSensitive) {
-    parts.push("<p><em>Details limited for privacy.</em></p>");
-  } else {
-    if (lot.originCityState) {
-      parts.push("<p>From: " + lot.originCityState + "</p>");
-    }
-    if (lot.phone) {
-      parts.push("<p>Phone: " + lot.phone + "</p>");
-    }
-    if (lot.notes) {
-      parts.push("<p>Notes: " + lot.notes + "</p>");
-    }
-  }
-
-  if (isSeasonStation(lot) && seasonDetails) {
-    parts.push(
-      "<p><strong>" + currentSeasonName +
-      " Station:</strong> " + seasonDetails + "</p>"
-    );
-  }
-
-  parts.push(
-    '<button class="popup-close" onclick="hidePopup()">Close</button>'
-  );
-
-  return '<div class="popup-inner">' + parts.join("") + "</div>";
-}
-
-function hidePopup() {
-  const popup = document.getElementById("lotPopup");
-  if (!popup) return;
-  popup.classList.add("hidden");
-  popup.classList.remove("visible");
-}
-window.hidePopup = hidePopup;
-
-// ------------------------
-// Hit testing + tap handling
-// ------------------------
-function findLotAt(x, y) {
-  const threshold = 25;
-  const thresholdSq = threshold * threshold;
-  let best = null;
-  let bestDist = thresholdSq;
-
-  if (!Array.isArray(LOTS)) return null;
-
-  LOTS.forEach(function (lot) {
-    if (!shouldShowLot(lot)) return;
-
-    const lx = Number(lot.x);
-    const ly = Number(lot.y);
-    if (isNaN(lx) || isNaN(ly)) return;
-
-    const dx = lx - x;
-    const dy = ly - y;
-    const d2 = dx * dx + dy * dy;
-    if (d2 < bestDist) {
-      bestDist = d2;
-      best = lot;
-    }
-  });
-
-  return best;
-}
-
-function showLotPopup(lot, clientX, clientY) {
-  const popup = document.getElementById("lotPopup");
-  if (!popup || !canvas || !mapWrapper) return;
-
-  const wrapperRect = mapWrapper.getBoundingClientRect();
-  const canvasRect = canvas.getBoundingClientRect();
-
-  popup.innerHTML = buildPopupContent(lot);
-  popup.classList.remove("hidden");
-  popup.classList.add("visible");
-
-  const offsetX = canvasRect.left - wrapperRect.left;
-  const offsetY = canvasRect.top - wrapperRect.top;
-
-  let left = (clientX - canvasRect.left) + offsetX + 12;
-  let top  = (clientY - canvasRect.top)  + offsetY + 12;
-
-  popup.style.left = left + "px";
-  popup.style.top  = top  + "px";
-
-  const popupRect = popup.getBoundingClientRect();
-
-  if (window.innerWidth <= 768) {
-    left = (wrapperRect.width - popupRect.width) / 2;
-  }
-
-  const maxLeft = wrapperRect.width - popupRect.width - 8;
-  const maxTop  = wrapperRect.height - popupRect.height - 8;
-
-  if (left < 8) left = 8;
-  if (left > maxLeft) left = maxLeft;
-  if (top < 8) top = 8;
-  if (top > maxTop) top = maxTop;
-
-  popup.style.left = left + "px";
-  popup.style.top  = top  + "px";
-}
-
-function showEventPopup(ev, clientX, clientY) {
-  const popup = document.getElementById("lotPopup");
-  if (!popup || !canvas || !mapWrapper) return;
-
-  const wrapperRect = mapWrapper.getBoundingClientRect();
-  const canvasRect = canvas.getBoundingClientRect();
-
-  popup.innerHTML = buildEventPopupContent(ev);
-  popup.classList.remove("hidden");
-  popup.classList.add("visible");
-
-  const offsetX = canvasRect.left - wrapperRect.left;
-  const offsetY = canvasRect.top - wrapperRect.top;
-
-  let left = (clientX - canvasRect.left) + offsetX + 12;
-  let top  = (clientY - canvasRect.top)  + offsetY + 12;
-
-  popup.style.left = left + "px";
-  popup.style.top  = top  + "px";
-
-  const popupRect = popup.getBoundingClientRect();
-
-  if (window.innerWidth <= 768) {
-    left = (wrapperRect.width - popupRect.width) / 2;
-  }
-
-  const maxLeft = wrapperRect.width - popupRect.width - 8;
-  const maxTop  = wrapperRect.height - popupRect.height - 8;
-
-  if (left < 8) left = 8;
-  if (left > maxLeft) left = maxLeft;
-  if (top < 8) top = maxTop;
-
-  popup.style.left = left + "px";
-  popup.style.top  = top  + "px";
-}
-
-function handleCanvasTap(clientX, clientY) {
-  if (!canvas || !mapWrapper) return;
-
-  const rect = canvas.getBoundingClientRect();
-  const x = clientX - rect.left;
-  const y = clientY - rect.top;
-
-  const lot = findLotAt(x, y);
-
-  if (lot) {
-    showLotPopup(lot, clientX, clientY);
-  } else {
-    hidePopup();
-  }
-}
-
-function setupCanvasEvents() {
-  if (!canvas) return;
-
-  canvas.addEventListener("click", function (e) {
-    handleCanvasTap(e.clientX, e.clientY);
-  });
-
-  canvas.addEventListener("touchend", function (e) {
-    if (e.changedTouches && e.changedTouches.length > 0) {
-      const t = e.changedTouches[0];
-      handleCanvasTap(t.clientX, t.clientY);
-    }
-  });
-}
-
-// ------------------------
-// Redraw
-// ------------------------
-function redrawMap() {
-  if (!canvas || !ctx) return;
-  resizeCanvasToWrapper();
-  drawMapBase();
-  drawLots();
-}
-
-// ------------------------
-// Season toggle + unlock
-// ------------------------
-function setupSeasonToggle() {
-  const checkbox = document.getElementById("seasonOnlyCheckbox");
-  if (!checkbox) return;
-
-  checkbox.addEventListener("change", function () {
-    if (!isUnlocked && !checkbox.checked) {
-      const entered = window.prompt("Enter password to unlock full map:");
-      if (entered === PASSWORD) {
-        isUnlocked = true;
-        isSeasonOnly = false;
-      } else {
-        alert("Incorrect password. Staying in seasonal privacy mode.");
-        checkbox.checked = true;
-        isSeasonOnly = true;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Phase 7 Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Detect Android WebView mode early to avoid flicker -->
+  <script>
+    (function () {
+      if (window.location.search.indexOf("android=1") !== -1) {
+        document.documentElement.classList.add("android-app");
       }
-      updateLockStatusUI();
-      drawLots();
-      return;
+    })();
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: #111827;
+      color: #f9fafb;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .header-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .header-subtitle {
+      font-size: 0.78rem;
+      color: #e5e7eb;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #111827;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+    }
+    .badge span {
+      white-space: nowrap;
+    }
+    .badge-label {
+      opacity: 0.85;
+    }
+    .lock-state {
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
+    .controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .toggle-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.78rem;
+    }
+    .toggle-wrapper input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+    }
+    .apk-button {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      color: #111827;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .apk-button:hover {
+      background: #e5e7eb;
+    }
+    .privacy-badge {
+      font-size: 0.7rem;
+      padding: 3px 6px;
+      border-radius: 999px;
+      border: 1px solid #f97316;
+      background: #1f2937;
+      color: #fed7aa;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .privacy-badge span {
+      white-space: nowrap;
     }
 
-    isSeasonOnly = checkbox.checked;
-    updateLockStatusUI();
-    drawLots();
-  });
-}
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
-// ------------------------
-// Map init
-// ------------------------
-function initMap() {
-  if (!initCanvasAndImage()) return;
+    .map-wrapper {
+      flex: 1;
+      position: relative;
+      background: #000000;
+    }
 
-  window.addEventListener("resize", function () {
-    redrawMap();
-  });
+    #phase7Canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #000000;
+    }
 
-  setupCanvasEvents();
-}
+    .legend-panel {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      background: rgba(17, 24, 39, 0.92);
+      color: #e5e7eb;
+      font-size: 0.75rem;
+      padding: 6px 8px;
+      border-radius: 6px;
+      max-width: 220px;
+      z-index: 200;
+    }
+    .legend-panel h3 {
+      margin: 0 0 4px 0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+    .legend-panel ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .legend-panel li {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+    .legend-dot-season {
+      background: #f97316;
+    }
+    .legend-dot-resident {
+      background: #3b82f6;
+    }
+    .legend-note {
+      margin-top: 4px;
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
 
-// ------------------------
-// Startup
-// ------------------------
-window.addEventListener("load", function () {
-  updateLockStatusUI();
-  updateApkButtonLabel();
+    /* Popup card */
+    #lotPopup {
+      position: absolute;
+      max-width: 260px;
+      background: #ffffff;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      z-index: 500;
 
-  const isWeb =
-    window.location.protocol === "http:" ||
-    window.location.protocol === "https:";
+      max-height: 60vh;
+      overflow-y: auto;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+	      /* NEW: prevent popup from going off-screen */
+    bottom: auto;
+    top: auto;
+    margin: 10px;           /* keeps it from touching screen edges */
+    box-sizing: border-box; /* ensures padding isn't added outside */
+    }
 
-  if (isWeb) {
-    fetchSeasonName();
-    fetchPassword();
-  } else {
-    console.warn("Running from file:// - skipping season/password fetch.");
+@media (max-width: 800px) {
+  #lotPopup {
+    left: 50% !important;
+    top: 20% !important;
+    transform: translateX(-50%);
+    max-width: 90vw;
+    max-height: 70vh;
   }
+}
 
-  setupPrivacyPanel();
-  setupSeasonToggle();
-  initMap();
-});
+
+    #lotPopup.hidden {
+      display: none;
+    }
+
+    #lotPopup h3 {
+      margin: 0 0 4px 0;
+      font-size: 0.9rem;
+    }
+
+    .popup-close {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+    }
+
+    .popup-inner p {
+      margin: 2px 0;
+    }
+
+    .apk-info {
+      font-size: 0.68rem;
+      color: #d1d5db;
+      margin-left: 4px;
+    }
+
+    footer {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      text-align: center;
+      color: #6b7280;
+      background: #f9fafb;
+    }
+
+    /* Adjust header layout on small screens */
+    @media (max-width: 640px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .header-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .header-subtitle {
+        font-size: 0.7rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-right {
+        flex-wrap: wrap;
+        row-gap: 4px;
+      }
+      .apk-button {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+      }
+      .badge {
+        font-size: 0.65rem;
+      }
+      .privacy-badge {
+        font-size: 0.65rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #lotPopup {
+        font-size: 0.75rem;
+      }
+      #lotPopup h3 {
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Privacy panel / modal */
+    .privacy-panel {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .privacy-panel.hidden {
+      display: none;
+    }
+
+    .privacy-content {
+      background: #ffffff;
+      max-width: 600px;
+      width: 90%;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+      font-size: 0.85rem;
+    }
+
+    .privacy-content h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .privacy-content p {
+      margin: 4px 0;
+      line-height: 1.3;
+    }
+
+    .privacy-buttons {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: #111827;
+      color: #f9fafb;
+      border-color: #111827;
+    }
+
+    .btn.primary:hover {
+      background: #1f2937;
+    }
+
+    .btn.secondary:hover {
+      background: #e5e7eb;
+    }
+
+    .unlock-row {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .unlock-row input[type="password"] {
+      flex: 1;
+      padding: 4px 8px;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="header-left">
+        <div class="header-title">Phase 7 Residents</div>
+        <div class="header-subtitle">
+          <span id="currentSeasonName">Holiday Season</span> • Latitude Margaritaville Hilton Head
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="controls">
+          <div class="badge">
+            <span class="badge-label">View Mode:</span>
+            <span id="seasonToggleLabel">Locked View</span>
+          </div>
+          <div class="toggle-wrapper">
+            <input type="checkbox" id="seasonToggleCheckbox" checked />
+            <label for="seasonToggleCheckbox">Season Only</label>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="privacy-badge">
+            <span>Privacy & Unlock</span>
+          </button>
+          <button id="apkButton" class="apk-button">Download Android App</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="map-wrapper" id="mapWrapper">
+        <canvas id="phase7Canvas"></canvas>
+
+        <!-- Legend -->
+        <div class="legend-panel">
+          <h3>Map Legend</h3>
+          <ul>
+            <li>
+              <span class="legend-dot legend-dot-season"></span>
+              <span>Season station / event</span>
+            </li>
+            <li>
+              <span class="legend-dot legend-dot-resident"></span>
+              <span>Resident lot</span>
+            </li>
+          </ul>
+          <div class="legend-note">
+            In privacy mode, only seasonal stations show details.
+          </div>
+        </div>
+
+        <!-- Popup -->
+        <div id="lotPopup" class="hidden"></div>
+      </div>
+    </main>
+
+    <footer>
+      Phase 7 Residents • Map & data from Phase7Data
+      <span id="apkInfo" class="apk-info"></span>
+    </footer>
+  </div>
+
+  <!-- Privacy / unlock modal -->
+  <div class="privacy-panel hidden">
+    <div class="privacy-content">
+      <h2>Resident Map Privacy & Unlock</h2>
+      <p>
+        This map contains resident names, home details, and event information for the
+        Phase 7 neighborhood in Latitude Margaritaville Hilton Head.
+      </p>
+      <p>
+        By default, the map is in <strong>Season-Only</strong> mode. In this mode, only
+        special event stations are highlighted with details. This protects resident privacy
+        when the map is shown publicly.
+      </p>
+      <p>
+        To view full resident details (names, addresses, and notes) on lots, you can unlock
+        the map with the community password. This should only be used by authorized residents
+        and is for <strong>internal neighborhood use only</strong>.
+      </p>
+
+      <div class="unlock-row">
+        <input
+          type="password"
+          id="unlockPasswordInput"
+          placeholder="Enter community password"
+        />
+        <button class="btn primary" id="unlockButton">Unlock</button>
+      </div>
+
+      <div class="privacy-buttons">
+        <button class="btn secondary" id="unlockCancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data + logic scripts -->
+  <script src="phase7_merged_lots.js"></script>
+  <script src="mapped_sites.js"></script>
+  <script src="draw_sites.js"></script>
+  <script src="draw_lots.js"></script>
+  <script src="events.js"></script>
+  <script src="event_engine.js"></script>
+  <script src="snow.js"></script>
+  <script src="map_core.js"></script>
+</body>
+</html>

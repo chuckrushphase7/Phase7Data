@@ -371,9 +371,7 @@ function buildPopupContent(lot) {
 
 function hidePopup() {
   const popup = document.getElementById("lotPopup");
-  if (!popup) return;
-  popup.classList.add("hidden");
-  popup.classList.remove("visible");
+  if (popup) popup.classList.add("hidden");
 }
 window.hidePopup = hidePopup;
 
@@ -416,45 +414,6 @@ function showLotPopup(lot, clientX, clientY) {
 
   popup.innerHTML = buildPopupContent(lot);
   popup.classList.remove("hidden");
-  popup.classList.add("visible");
-
-  const offsetX = canvasRect.left - wrapperRect.left;
-  const offsetY = canvasRect.top - wrapperRect.top;
-
-  let left = (clientX - canvasRect.left) + offsetX + 12;
-  let top  = (clientY - canvasRect.top)  + offsetY + 12;
-
-  popup.style.left = left + "px";
-  popup.style.top  = top  + "px";
-
-  const popupRect = popup.getBoundingClientRect();
-
-  if (window.innerWidth <= 768) {
-    left = (wrapperRect.width - popupRect.width) / 2;
-  }
-
-  const maxLeft = wrapperRect.width - popupRect.width - 8;
-  const maxTop  = wrapperRect.height - popupRect.height - 8;
-
-  if (left < 8) left = 8;
-  if (left > maxLeft) left = maxLeft;
-  if (top < 8) top = 8;
-  if (top > maxTop) top = maxTop;
-
-  popup.style.left = left + "px";
-  popup.style.top  = top  + "px";
-}
-
-function showEventPopup(ev, clientX, clientY) {
-  const popup = document.getElementById("lotPopup");
-  if (!popup || !canvas || !mapWrapper) return;
-
-  const wrapperRect = mapWrapper.getBoundingClientRect();
-  const canvasRect = canvas.getBoundingClientRect();
-
-  popup.innerHTML = buildEventPopupContent(ev);
-  popup.classList.remove("hidden");
-  popup.classList.add("visible");
 
   const offsetX = canvasRect.left - wrapperRect.left;
   const offsetY = canvasRect.top - wrapperRect.top;
@@ -589,5 +548,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   setupPrivacyPanel();
   setupSeasonToggle();
+  setupApkButton();
   initMap();
 });
