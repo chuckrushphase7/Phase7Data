@@ -2,33 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Phase 7 Map</title>
+  <title>Phase 7 Residents</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Detect Android WebView mode early to avoid flicker -->
-  <script>
-    (function () {
-      if (window.location.search.indexOf("android=1") !== -1) {
-        document.documentElement.classList.add("android-app");
-      }
-    })();
-  </script>
 
   <style>
     * {
       box-sizing: border-box;
     }
+
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #f3f4f6;
       color: #111827;
     }
+
     .app-shell {
       display: flex;
       flex-direction: column;
       min-height: 100vh;
     }
+
     header {
       background: #111827;
       color: #f9fafb;
@@ -38,19 +32,23 @@
       justify-content: space-between;
       gap: 8px;
     }
+
     .header-left {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
+
     .header-title {
       font-size: 1rem;
       font-weight: 600;
     }
+
     .header-subtitle {
       font-size: 0.78rem;
       color: #e5e7eb;
     }
+
     .header-right {
       display: flex;
       align-items: center;
@@ -58,6 +56,15 @@
       flex-wrap: wrap;
       justify-content: flex-end;
     }
+
+    .controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
     .badge {
       display: inline-flex;
       align-items: center;
@@ -68,33 +75,27 @@
       padding: 2px 8px;
       font-size: 0.7rem;
     }
+
     .badge span {
       white-space: nowrap;
     }
+
     .badge-label {
       opacity: 0.85;
     }
-    .lock-state {
-      font-size: 0.75rem;
-      opacity: 0.9;
-    }
-    .controls {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
+
     .toggle-wrapper {
       display: inline-flex;
       align-items: center;
       gap: 4px;
       font-size: 0.78rem;
     }
+
     .toggle-wrapper input[type="checkbox"] {
       width: 16px;
       height: 16px;
     }
+
     .apk-button {
       font-size: 0.75rem;
       padding: 3px 8px;
@@ -105,9 +106,11 @@
       cursor: pointer;
       white-space: nowrap;
     }
+
     .apk-button:hover {
       background: #e5e7eb;
     }
+
     .privacy-badge {
       font-size: 0.7rem;
       padding: 3px 6px;
@@ -120,6 +123,7 @@
       align-items: center;
       gap: 4px;
     }
+
     .privacy-badge span {
       white-space: nowrap;
     }
@@ -155,42 +159,49 @@
       max-width: 220px;
       z-index: 200;
     }
+
     .legend-panel h3 {
       margin: 0 0 4px 0;
       font-size: 0.8rem;
       font-weight: 600;
       color: #f9fafb;
     }
+
     .legend-panel ul {
       list-style: none;
       padding: 0;
       margin: 0;
     }
+
     .legend-panel li {
       display: flex;
       align-items: center;
       gap: 6px;
       margin-bottom: 3px;
     }
+
     .legend-dot {
       width: 10px;
       height: 10px;
       border-radius: 999px;
       flex-shrink: 0;
     }
+
     .legend-dot-season {
       background: #f97316;
     }
+
     .legend-dot-resident {
       background: #3b82f6;
     }
+
     .legend-note {
       margin-top: 4px;
       font-size: 0.7rem;
       color: #9ca3af;
     }
 
-    /* Popup card */
+    /* Popup card – scrollable & mobile-safe */
     #lotPopup {
       position: absolute;
       max-width: 260px;
@@ -207,23 +218,12 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
       white-space: normal;
-	      /* NEW: prevent popup from going off-screen */
-    bottom: auto;
-    top: auto;
-    margin: 10px;           /* keeps it from touching screen edges */
-    box-sizing: border-box; /* ensures padding isn't added outside */
+
+      bottom: auto;
+      top: auto;
+      margin: 10px;
+      box-sizing: border-box;
     }
-
-@media (max-width: 800px) {
-  #lotPopup {
-    left: 50% !important;
-    top: 20% !important;
-    transform: translateX(-50%);
-    max-width: 90vw;
-    max-height: 70vh;
-  }
-}
-
 
     #lotPopup.hidden {
       display: none;
@@ -234,14 +234,21 @@
       font-size: 0.9rem;
     }
 
+    .popup-inner p {
+      margin: 2px 0;
+    }
+
     .popup-close {
       margin-top: 6px;
       font-size: 0.75rem;
       padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #f3f4f6;
     }
 
-    .popup-inner p {
-      margin: 2px 0;
+    .popup-close:hover {
+      background: #e5e7eb;
     }
 
     .apk-info {
@@ -258,21 +265,24 @@
       background: #f9fafb;
     }
 
-    /* Adjust header layout on small screens */
+    /* Header layout tweaks on small screens */
     @media (max-width: 640px) {
       header {
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
       }
+
       .header-right {
         width: 100%;
         justify-content: space-between;
       }
+
       .controls {
         width: 100%;
         justify-content: space-between;
       }
+
       .header-subtitle {
         font-size: 0.7rem;
       }
@@ -283,22 +293,34 @@
         flex-wrap: wrap;
         row-gap: 4px;
       }
+
       .apk-button {
         font-size: 0.7rem;
         padding: 2px 6px;
       }
+
       .badge {
         font-size: 0.65rem;
       }
+
       .privacy-badge {
         font-size: 0.65rem;
       }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 800px) {
+      #lotPopup {
+        left: 50% !important;
+        top: 20% !important;
+        transform: translateX(-50%);
+        max-width: 90vw;
+        max-height: 70vh;
+      }
+
       #lotPopup {
         font-size: 0.75rem;
       }
+
       #lotPopup h3 {
         font-size: 0.85rem;
       }

@@ -170,9 +170,22 @@ function shouldShowLot(lot) {
 // ------------------------
 function loadMapImage(callback) {
   mapImg = new Image();
+
+  // If first image loads, we’re done
   mapImg.onload = callback;
+
+  // If MapArt_Phase7-min.png fails (e.g., in Android assets),
+  // fall back to Phase7Org.png which we KNOW is there.
+  mapImg.onerror = function () {
+    console.warn("Failed to load MapArt_Phase7-min.png, trying Phase7Org.png");
+    mapImg.onerror = null; // avoid loops
+    mapImg.src = "Phase7Org.png";
+  };
+
+  // Try compressed web image first
   mapImg.src = "MapArt_Phase7-min.png";
 }
+
 
 function initCanvas() {
   canvas = document.getElementById("phase7Canvas");
