@@ -4044,9 +4044,9 @@ const phaseResidentsData = [
     "y": 572,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Spiked warm cider,  christmas crack ( sweet treat ) and  snack cups and venison sausage and cheese platter - Nicole Iannarone, Scotty Shots, Jim and Linda Alberico and Greg and Raelee Emslie"
   },
   {
     "phaseNumber": 7,
