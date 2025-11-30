@@ -15,35 +15,90 @@ const LOTS = (typeof phaseResidentsData !== "undefined") ? phaseResidentsData : 
 // ------------------------
 // Season + lock UI
 // ------------------------
-function getSeasonIcon(name) {
-  const lower = (name || "").toLowerCase();
-  if (lower.indexOf("halloween") >= 0) return "🎃";
-  if (lower.indexOf("christmas") >= 0) return "🎄";
-  if (lower.indexOf("holiday") >= 0) return "🎉";
-  if (lower.indexOf("light") >= 0) return "✨";
-  if (lower.indexOf("spring") >= 0) return "🌸";
-  if (lower.indexOf("summer") >= 0) return "☀️";
-  if (lower.indexOf("fall") >= 0 || lower.indexOf("autumn") >= 0) return "🍂";
-  return "⭐";
-}
-
 function updateSeasonToggleLabel() {
-  const span = document.getElementById("seasonOnlyLabel");
-  if (!span) return;
-  const icon = getSeasonIcon(currentSeasonName);
-  span.textContent = icon + " " + currentSeasonName + " Only";
+  const labelSpan = document.getElementById("seasonToggleLabel");
+  if (!labelSpan) return;
+
+  if (!isUnlocked) {
+    labelSpan.textContent = "Locked View";
+    return;
+  }
+
+  labelSpan.textContent = isSeasonOnly
+    ? currentSeasonName + " Only"
+    : "Full Resident Map";
 }
 
-function updateLockStatusUI() {
-  const el = document.getElementById("lockStatus");
-  if (!el) return;
-  el.textContent = isUnlocked
-    ? "Full map unlocked (session only)"
-    : "Season view only (privacy mode)";
+function setSeasonOnly(value) {
+  isSeasonOnly = !!value;
+  updateSeasonToggleLabel();
+  redrawMap();
+}
+
+function setupSeasonToggle() {
+  const toggle = document.getElementById("seasonToggleCheckbox");
+  if (!toggle) return;
+
+  toggle.checked = isSeasonOnly;
+  toggle.addEventListener("change", function () {
+    setSeasonOnly(toggle.checked);
+  });
+}
+
+function showPrivacyPanel() {
+  const panel = document.querySelector(".privacy-panel");
+  if (panel) {
+    panel.classList.remove("hidden");
+  }
+}
+
+function hidePrivacyPanel() {
+  const panel = document.querySelector(".privacy-panel");
+  if (panel) {
+    panel.classList.add("hidden");
+  }
+}
+
+function attemptUnlock() {
+  const input = document.getElementById("unlockPasswordInput");
+  if (!input) return;
+
+  const entered = input.value.trim();
+  if (!entered) {
+    alert("Please enter a password.");
+    return;
+  }
+
+  if (entered === PASSWORD) {
+    isUnlocked = true;
+    hidePrivacyPanel();
+    updateSeasonToggleLabel();
+    redrawMap();
+  } else {
+    alert("Incorrect password. Please try again.");
+  }
+}
+
+function setupPrivacyPanel() {
+  const unlockBtn = document.getElementById("unlockButton");
+  const cancelBtn = document.getElementById("unlockCancel");
+
+  if (unlockBtn) {
+    unlockBtn.addEventListener("click", attemptUnlock);
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", hidePrivacyPanel);
+  }
+
+  const privacyBadge = document.querySelector(".privacy-badge");
+  if (privacyBadge) {
+    privacyBadge.addEventListener("click", showPrivacyPanel);
+  }
 }
 
 // ------------------------
-// Fetch season + password (web only)
+// Season name + password fetch
 // ------------------------
 function fetchSeasonName() {
   fetch("season_name.txt")
@@ -51,10 +106,12 @@ function fetchSeasonName() {
     .then(function (text) {
       const trimmed = text.trim();
       if (trimmed) currentSeasonName = trimmed;
+      const seasonLabel = document.getElementById("currentSeasonName");
+      if (seasonLabel) seasonLabel.textContent = currentSeasonName;
       updateSeasonToggleLabel();
     })
-    .catch(function () {
-      updateSeasonToggleLabel();
+    .catch(function (err) {
+      console.error("Failed to fetch season_name.txt", err);
     });
 }
 
@@ -67,54 +124,182 @@ function fetchPassword() {
       console.log("Password loaded from file.");
     })
     .catch(function (err) {
-      console.warn("Could not load phase7_password.txt, using default.", err);
+      console.error("Failed to fetch phase7_password.txt", err);
     });
 }
 
 // ------------------------
-// APK label + download
+// Filtering helpers
 // ------------------------
-function updateApkButtonLabel() {
-  if (typeof APK_LAST_UPDATED === "undefined") return;
-  const btn = document.getElementById("apkDownloadButton");
-  if (!btn) return;
-  btn.textContent = "Download Android App (" + APK_LAST_UPDATED + ")";
+function isSeasonStation(lotOrEvent) {
+  return !!lotOrEvent && !!lotOrEvent.seasonStation;
 }
 
-function handleAndroidDownloadClick() {
-  // Always use the public GitHub Pages URL for the APK
-  window.location.href = "https://chuckrushphase7.github.io/Phase7Data/Phase7Residents.apk";
+function getSeasonDetails(lotOrEvent) {
+  return lotOrEvent && lotOrEvent.seasonDetails
+    ? lotOrEvent.seasonDetails
+    : "";
 }
-window.handleAndroidDownloadClick = handleAndroidDownloadClick;
 
+// Determine if this lot should be shown for the current view state
+function shouldShowLot(lot) {
+  if (!lot) return false;
 
-// ------------------------
-// Privacy panel
-// ------------------------
-function setupPrivacyPanel() {
-  const btn = document.getElementById("privacyButton");
-  const panel = document.getElementById("privacyPanel");
-  const closeBtn = document.getElementById("privacyCloseButton");
+  // Hide entirely if flagged not visible
+  if (lot.hideOnMap) return false;
 
-  if (!btn || !panel || !closeBtn) return;
+  if (!isUnlocked) {
+    // In locked mode:
+    // - If "Season Only", only show season stations.
+    // - If not, still show all lots for the map geometry.
+    return isSeasonOnly ? isSeasonStation(lot) : true;
+  }
 
-  btn.addEventListener("click", function () {
-    panel.classList.remove("hidden");
-  });
+  // Unlocked view:
+  if (isSeasonOnly) {
+    // Show only lots or events marked as season stations
+    return isSeasonStation(lot);
+  }
 
-  closeBtn.addEventListener("click", function () {
-    panel.classList.add("hidden");
-  });
-
-  panel.addEventListener("click", function (e) {
-    if (e.target === panel) panel.classList.add("hidden");
-  });
+  // Full mode: show everything that's not explicitly hidden
+  return true;
 }
 
 // ------------------------
-// Lot popup helpers
-// (these use helpers from draw_lots.js: isSeasonStation, getSeasonDetails, shouldShowLot)
+// Map + drawing
 // ------------------------
+function loadMapImage(callback) {
+  mapImg = new Image();
+  mapImg.onload = callback;
+  mapImg.src = "MapArt_Phase7-min.png";
+}
+
+function initCanvas() {
+  canvas = document.getElementById("phase7Canvas");
+  if (!canvas) return;
+  ctx = canvas.getContext("2d");
+}
+
+function resizeCanvasToWrapper() {
+  if (!canvas || !mapWrapper) return;
+
+  const rect = mapWrapper.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+}
+
+// Fit the map image into the canvas, preserving aspect ratio
+function drawMapBase() {
+  if (!ctx || !mapImg) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const imgAspect = mapImg.width / mapImg.height;
+  const canvasAspect = canvas.width / canvas.height;
+
+  let drawWidth, drawHeight, offsetX, offsetY;
+  if (imgAspect > canvasAspect) {
+    // Image is wider relative to canvas
+    drawWidth = canvas.width;
+    drawHeight = canvas.width / imgAspect;
+    offsetX = 0;
+    offsetY = (canvas.height - drawHeight) / 2;
+  } else {
+    // Image is taller relative to canvas
+    drawHeight = canvas.height;
+    drawWidth = canvas.height * imgAspect;
+    offsetX = (canvas.width - drawWidth) / 2;
+    offsetY = 0;
+  }
+
+  ctx.drawImage(mapImg, offsetX, offsetY, drawWidth, drawHeight);
+}
+
+// ------------------------
+// Lot + event drawing
+// ------------------------
+function lotToCanvasCoords(lot) {
+  if (!lot || !canvas || !mapImg) return null;
+
+  const imgAspect = mapImg.width / mapImg.height;
+  const canvasAspect = canvas.width / canvas.height;
+
+  let drawWidth, drawHeight, offsetX, offsetY;
+  if (imgAspect > canvasAspect) {
+    drawWidth = canvas.width;
+    drawHeight = canvas.width / imgAspect;
+    offsetX = 0;
+    offsetY = (canvas.height - drawHeight) / 2;
+  } else {
+    drawHeight = canvas.height;
+    drawWidth = canvas.height * imgAspect;
+    offsetX = (canvas.width - drawWidth) / 2;
+    offsetY = 0;
+  }
+
+  const nx = Number(lot.mapX || lot.x) / 1000;
+  const ny = Number(lot.mapY || lot.y) / 1000;
+
+  return {
+    x: offsetX + nx * drawWidth,
+    y: offsetY + ny * drawHeight
+  };
+}
+
+function drawLots() {
+  if (!ctx || !Array.isArray(LOTS)) return;
+
+  LOTS.forEach(function (lot) {
+    if (!shouldShowLot(lot)) return;
+
+    const coords = lotToCanvasCoords(lot);
+    if (!coords) return;
+
+    const r = isSeasonStation(lot) ? 6 : 3;
+    const color = isSeasonStation(lot) ? "#ff6600" : "#0080ff";
+
+    ctx.beginPath();
+    ctx.arc(coords.x, coords.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+  });
+}
+
+function getSeasonIcon(name) {
+  const lower = (name || "").toLowerCase();
+  if (lower.indexOf("holiday") !== -1) return "🎄";
+  if (lower.indexOf("halloween") !== -1) return "🎃";
+  if (lower.indexOf("summer") !== -1) return "☀️";
+  return "⭐";
+}
+
+function buildEventPopupContent(ev) {
+  const parts = [];
+
+  const title = ev.title || (currentSeasonName + " Station");
+  const icon = getSeasonIcon(currentSeasonName);
+
+  parts.push("<h3>" + icon + " " + title + "</h3>");
+
+  if (ev.description) {
+    parts.push("<p>" + ev.description + "</p>");
+  }
+
+  if (ev.host) {
+    parts.push("<p><strong>Hosts:</strong> " + ev.host + "</p>");
+  }
+
+  if (ev.time) {
+    parts.push("<p><strong>Time:</strong> " + ev.time + "</p>");
+  }
+
+  parts.push(
+    '<button class="popup-close" onclick="hidePopup()">Close</button>'
+  );
+
+  return '<div class="popup-inner">' + parts.join("") + "</div>";
+}
+
 function buildPopupContent(lot) {
   const seasonDetails = getSeasonDetails(lot);
 
@@ -192,7 +377,6 @@ function hidePopup() {
 }
 window.hidePopup = hidePopup;
 
-
 // ------------------------
 // Hit testing + tap handling
 // ------------------------
@@ -209,13 +393,12 @@ function findLotAt(x, y) {
 
     const lx = Number(lot.x);
     const ly = Number(lot.y);
-    if (!Number.isFinite(lx) || !Number.isFinite(ly)) return;
+    if (isNaN(lx) || isNaN(ly)) return;
 
-    const dx = x - lx;
-    const dy = y - ly;
+    const dx = lx - x;
+    const dy = ly - y;
     const d2 = dx * dx + dy * dy;
-
-    if (d2 <= bestDist) {
+    if (d2 < bestDist) {
       bestDist = d2;
       best = lot;
     }
@@ -231,7 +414,7 @@ function showLotPopup(lot, clientX, clientY) {
   const wrapperRect = mapWrapper.getBoundingClientRect();
   const canvasRect = canvas.getBoundingClientRect();
 
-   popup.innerHTML = buildPopupContent(lot);
+  popup.innerHTML = buildPopupContent(lot);
   popup.classList.remove("hidden");
   popup.classList.add("visible");
 
@@ -272,7 +455,6 @@ function showEventPopup(ev, clientX, clientY) {
   popup.innerHTML = buildEventPopupContent(ev);
   popup.classList.remove("hidden");
   popup.classList.add("visible");
-    const offsetX = canvasRect.left - wrapperRect.left;
 
   const offsetX = canvasRect.left - wrapperRect.left;
   const offsetY = canvasRect.top - wrapperRect.top;
@@ -302,22 +484,14 @@ function showEventPopup(ev, clientX, clientY) {
 }
 
 function handleCanvasTap(clientX, clientY) {
+  if (!canvas || !mapWrapper) return;
+
   const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
 
-  const cx = (clientX - rect.left) * scaleX;
-  const cy = (clientY - rect.top)  * scaleY;
+  const lot = findLotAt(x, y);
 
-  // 1) Events
-  const ev = findEventAt(cx, cy);
-  if (ev) {
-    showEventPopup(ev, clientX, clientY);
-    return;
-  }
-
-  // 2) Lots
-  const lot = findLotAt(cx, cy);
   if (lot) {
     showLotPopup(lot, clientX, clientY);
   } else {
@@ -339,70 +513,68 @@ function setupCanvasEvents() {
 }
 
 // ------------------------
-// Season-only toggle
+// Redraw
 // ------------------------
-function setupSeasonToggle() {
-  const checkbox = document.getElementById("seasonOnlyCheckbox");
-  if (!checkbox) return;
-
-  checkbox.addEventListener("change", function () {
-    if (!isUnlocked && !checkbox.checked) {
-      const entered = window.prompt("Enter password to unlock full map:");
-      if (entered === PASSWORD) {
-        isUnlocked = true;
-        isSeasonOnly = false;
-      } else {
-        alert("Incorrect password. Staying in seasonal privacy mode.");
-        checkbox.checked = true;
-        isSeasonOnly = true;
-      }
-      updateLockStatusUI();
-      drawLots();
-      return;
-    }
-
-    isSeasonOnly = checkbox.checked;
-    updateLockStatusUI();
-    drawLots();
-  });
+function redrawMap() {
+  if (!canvas || !ctx) return;
+  resizeCanvasToWrapper();
+  drawMapBase();
+  drawLots();
 }
 
 // ------------------------
-// Map init
+// APK button + info
+// ------------------------
+function setupApkButton() {
+  const apkButton = document.getElementById("apkButton");
+  const apkInfoSpan = document.getElementById("apkInfo");
+
+  if (!apkButton) return;
+
+  apkButton.addEventListener("click", function () {
+    window.open(
+      "https://github.com/" +
+        encodeURIComponent("chuckrushphase7") +
+        "/" +
+        encodeURIComponent("Phase7Data") +
+        "/releases/download/v1.0.0/Phase7Residents.apk",
+      "_blank"
+    );
+  });
+
+  if (typeof apkInfo !== "undefined" && apkInfoSpan) {
+    apkInfoSpan.textContent =
+      "Build: " + apkInfo.buildDate + " (" + apkInfo.tag + ")";
+  }
+}
+
+// ------------------------
+// Init
 // ------------------------
 function initMap() {
-  canvas = document.getElementById("mapCanvas");
-  mapWrapper = document.getElementById("mapWrapper");
-  if (!canvas || !mapWrapper) {
-    console.error("Canvas or mapWrapper not found in DOM.");
+  mapWrapper = document.querySelector(".map-wrapper");
+  if (!mapWrapper) {
+    console.error("No .map-wrapper found.");
     return;
   }
 
-  ctx = canvas.getContext("2d");
-  mapImg = new Image();
-  mapImg.src = "Phase7Org.png";
+  initCanvas();
+  if (!canvas) {
+    console.error("No #phase7Canvas found.");
+    return;
+  }
 
-  mapImg.onload = function () {
-    console.log("Map image loaded:", mapImg.width, "x", mapImg.height);
-    canvas.width  = mapImg.width;
-    canvas.height = mapImg.height;
+  loadMapImage(function () {
+    resizeCanvasToWrapper();
+    drawMapBase();
     drawLots();
-  };
+  });
 
-  mapImg.onerror = function (e) {
-    console.error("FAILED to load map image Phase7Org.png", e);
-  };
-
+  window.addEventListener("resize", redrawMap);
   setupCanvasEvents();
 }
 
-// ------------------------
-// Startup
-// ------------------------
-window.addEventListener("load", function () {
-  updateLockStatusUI();
-  updateApkButtonLabel();
-
+document.addEventListener("DOMContentLoaded", function () {
   const isWeb =
     window.location.protocol === "http:" ||
     window.location.protocol === "https:";

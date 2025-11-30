@@ -116,7 +116,7 @@
       text-align: center;
     }
 
-     /* Popup card – upgraded layout + animation */
+    /* Popup card – upgraded layout + animation */
     #lotPopup {
       position: absolute;
       background: #ffffff;
@@ -149,19 +149,17 @@
       pointer-events: auto;
     }
 
-    /* Hidden state for compatibility with existing JS */
+    /* Hidden state (used by hidePopup) */
     #lotPopup.hidden {
       display: none;
     }
 
-    /* Title inside popup (<h3> from buildPopupContent) */
     #lotPopup h3 {
       margin: 0 0 6px 0;
       font-size: 0.9rem;
       font-weight: 600;
     }
 
-    /* Inner content wrapper (you already output <div class="popup-inner">) */
     .popup-inner {
       margin-top: 2px;
     }
@@ -170,7 +168,6 @@
       margin: 2px 0;
     }
 
-    /* Close button at bottom */
     .popup-close {
       margin-top: 8px;
       font-size: 0.75rem;
@@ -207,36 +204,6 @@
       }
     }
 
-
-
-
-    #lotPopup.hidden {
-      display: none;
-    }
-
-    #lotPopup h3 {
-      margin: 0 0 4px 0;
-      font-size: 0.9rem;
-    }
-
-    .popup-close {
-      margin-top: 6px;
-      font-size: 0.75rem;
-      padding: 2px 6px;
-    }
-
-    .popup-inner p {
-      margin: 2px 0;
-    }
-
-    @media (max-width: 600px) {
-      #lotPopup {
-        font-size: 0.75rem;
-      }
-      #lotPopup h3 {
-        font-size: 0.85rem;
-      }
-    }
 
     /* Privacy panel / modal */
     .privacy-panel {
