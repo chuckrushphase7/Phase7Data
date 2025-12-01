@@ -30,6 +30,16 @@ function updateSeasonToggleLabel() {
 }
 
 function setSeasonOnly(value) {
+  const toggle = document.getElementById("seasonToggleCheckbox");
+
+  // If trying to turn OFF Season Only while still locked,
+  // snap the checkbox back ON and show the privacy/unlock panel.
+  if (!value && !isUnlocked) {
+    if (toggle) toggle.checked = true;
+    showPrivacyPanel();
+    return;
+  }
+
   isSeasonOnly = !!value;
   updateSeasonToggleLabel();
   redrawMap();
@@ -44,6 +54,8 @@ function setupSeasonToggle() {
     setSeasonOnly(toggle.checked);
   });
 }
+
+
 
 function showPrivacyPanel() {
   const panel = document.querySelector(".privacy-panel");
@@ -134,22 +146,36 @@ function fetchPassword() {
 function isSeasonStation(lotOrEvent) {
   if (!lotOrEvent) return false;
 
-  // Treat either a true seasonStation flag OR non-empty seasonDetails text
-  // as a "season station" for the Holiday / event view.
-  const hasFlag = !!lotOrEvent.seasonStation;
-  const hasDetails =
-    typeof lotOrEvent.seasonDetails === "string" &&
-    lotOrEvent.seasonDetails.trim().length > 0;
+  // Old naming: seasonStation
+  const flagSeason = !!lotOrEvent.seasonStation;
 
-  return hasFlag || hasDetails;
+  // New naming: isChristmasStation
+  const flagChristmas = !!lotOrEvent.isChristmasStation;
+
+  // If either flag is true, treat as a season/Christmas station
+  return flagSeason || flagChristmas;
 }
+
+
 
 
 function getSeasonDetails(lotOrEvent) {
-  return lotOrEvent && lotOrEvent.seasonDetails
-    ? lotOrEvent.seasonDetails
-    : "";
+  if (!lotOrEvent) return "";
+
+  // Old naming: seasonDetails
+  let details = "";
+  if (typeof lotOrEvent.seasonDetails === "string") {
+    details = lotOrEvent.seasonDetails.trim();
+  }
+
+  // New naming: christmasStationDetails
+  if (!details && typeof lotOrEvent.christmasStationDetails === "string") {
+    details = lotOrEvent.christmasStationDetails.trim();
+  }
+
+  return details;
 }
+
 
 // Determine if this lot should be shown for the current view state
 function shouldShowLot(lot) {
@@ -174,6 +200,8 @@ function shouldShowLot(lot) {
   // Full mode: show everything that's not explicitly hidden
   return true;
 }
+
+
 
 // ------------------------
 // Map + drawing
