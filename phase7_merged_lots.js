@@ -15,9 +15,9 @@ const phaseResidentsData = [
     "y": 183,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Pudding shots - Nancy Campbell"
   },
   {
     "phaseNumber": 7,
@@ -100,9 +100,9 @@ const phaseResidentsData = [
     "y": 285,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Light Snacks"
   },
   {
     "phaseNumber": 7,
@@ -238,7 +238,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Irish Cr\u00e8me shots and mini-pumpkin chocolate chip cookies  -  Debra & Rick Nash / Tim and Cathy Brophy"
+    "christmasStationDetails": "Irish Cr\u00e8me shots and mini-pumpkin chocolate chip cookies  -  Debra Nash"
   },
   {
     "phaseNumber": 7,
@@ -340,7 +340,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks  -  Scott Custer"
+    "christmasStationDetails": "Drinks  -"
   },
   {
     "phaseNumber": 7,
@@ -459,7 +459,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks  -  Robert Chittenden"
+    "christmasStationDetails": "Drinks  -"
   },
   {
     "phaseNumber": 7,
@@ -748,7 +748,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks  -  Tina McElwain"
+    "christmasStationDetails": "Drinks  -"
   },
   {
     "phaseNumber": 7,
@@ -867,7 +867,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks  -  Williamson Anderson"
+    "christmasStationDetails": "Drinks  -"
   },
   {
     "phaseNumber": 7,
@@ -882,7 +882,7 @@ const phaseResidentsData = [
     "y": 644,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
     "christmasStationDetails": null
   },
@@ -935,7 +935,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks  -  Bob Gee"
+    "christmasStationDetails": "Drinks  -"
   },
   {
     "phaseNumber": 7,
@@ -1035,9 +1035,9 @@ const phaseResidentsData = [
     "y": 402,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Drinks - Cynthia Kelly"
   },
   {
     "phaseNumber": 7,
@@ -1513,7 +1513,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Pudding shots  -  Ruth Oliveto"
+    "christmasStationDetails": "Pudding Shots - Ruth Oliveto"
   },
   {
     "phaseNumber": 7,
@@ -1851,9 +1851,9 @@ const phaseResidentsData = [
     "y": 471,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Cinnamon Toast Crunch Shots / Candy Canes - larissa Kallander"
   },
   {
     "phaseNumber": 7,
@@ -2312,7 +2312,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "PeppermintRum Chata and candy canes  -  LaNita Cloninger"
+    "christmasStationDetails": "Peppermint Rum Chata and candy canes  -  LaNita Cloninger"
   },
   {
     "phaseNumber": 7,
@@ -3332,7 +3332,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Candy Cane shots  -  Karol Godsey"
+    "christmasStationDetails": "Candy Cane Shots - Karol Godsey"
   },
   {
     "phaseNumber": 7,
@@ -3823,9 +3823,9 @@ const phaseResidentsData = [
     "y": 545,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Fireball Chocolate covered cherries - Cathy & George Weckel"
   },
   {
     "phaseNumber": 7,
@@ -4044,9 +4044,9 @@ const phaseResidentsData = [
     "y": 572,
     "phone": null,
     "notes": null,
-    "isChristmasStation": true,
+    "isChristmasStation": false,
     "isSensitive": false,
-    "christmasStationDetails": "Spiked warm cider,  christmas crack ( sweet treat ) and  snack cups and venison sausage and cheese platter - Nicole Iannarone, Scotty Shots, Jim and Linda Alberico and Greg and Raelee Emslie"
+    "christmasStationDetails": null
   },
   {
     "phaseNumber": 7,
@@ -4384,9 +4384,9 @@ const phaseResidentsData = [
     "y": 705,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Holiday Shots / Pepermint Bark - Greg & Lisa Mathison / Lesli Eiland"
   },
   {
     "phaseNumber": 7,
@@ -4435,9 +4435,9 @@ const phaseResidentsData = [
     "y": 713,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Drinks & Light Snacks - Michelle Proser"
   },
   {
     "phaseNumber": 7,
@@ -5523,9 +5523,9 @@ const phaseResidentsData = [
     "y": 1025,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Drinks/Light Snacks - Greg Viebranz"
   },
   {
     "phaseNumber": 7,
@@ -5795,9 +5795,9 @@ const phaseResidentsData = [
     "y": 1056,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Mulled Wine / Fudge /Chocolate Diped Pretzels - Cindy and Ken Bond/Lois and Brad Lane, Kathy Scurci and Jim Bradenstein"
   },
   {
     "phaseNumber": 7,
@@ -6067,9 +6067,9 @@ const phaseResidentsData = [
     "y": 746,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Christmas Cookie Shots - Trish O\u2019Connell and Jack Kelleher/Lisa and Mike Ehrenberg/Brenda Reese/Gayle Gilbreth"
   },
   {
     "phaseNumber": 7,
@@ -7614,9 +7614,9 @@ const phaseResidentsData = [
     "y": 836,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Drinks - Maria Nasuti"
   },
   {
     "phaseNumber": 7,

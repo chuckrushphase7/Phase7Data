@@ -13,7 +13,7 @@ const EVENTS = [
     requiresUnlock: false,
     seasons: [],                   // [] = all seasons, always visible
     description:
-      "Join us at Blue Guitar Park for a magical picture with Santa and His Sleigh."
+      "Join us at Blue Guitar Park for a magical picture with Santa & Ms. Claus and their Sleigh."
   },
 
   // Global snow overlay tied to the same scene

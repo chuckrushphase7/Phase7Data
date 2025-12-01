@@ -1,10 +1,10 @@
 ﻿phaseNumber,lotNumber,homeTypeStyle,contractStatus,primaryName,secondaryName,originCityState,address,x,y,phone,notes,isChristmasStation,isSensitive,christmasStationDetails
-7,1697,"Parrott, n/a",UC,Doug Campbell,Nancy Campbell,"Powell, OH",225 Fins Up Ct.,386,183,,,Y,,Pudding shots - Nancy Campbell
+7,1697,"Parrott, n/a",UC,Doug Campbell,Nancy Campbell,"Powell, OH",225 Fins Up Ct.,386,183,,,,,
 7,1698,"Beach, Cabana Bay",UC,Al Maas,Donna Maas,"Hawthorne , NJ",203 Fins Up Ct.,380,202,,,,,
 7,1699,"Beach, Hammock Bay",UC,Nancy O'Reilly,Miles O'Reilly,"Chicago, IL",195 Fins Up Ct.,382,224,,,,,
 7,1700,"Beach, Coconut",UC, ,,,181 Fins Up Ct.,382,244,,,,,
 7,1701,"Beach, Breeze Bay",UC,Nancy LaRocque,Dennis Ciotti,"Dover, NH",153 Fins Up Ct.,379,269,,,,,
-7,1702,"Beach, Coconut",UC,John Dovishaw,Helene Farrell-Dovishaw,"University Heights, OH",131 Fins Up Ct.,375,285,,,Y,,Light Snacks
+7,1702,"Beach, Coconut",UC,John Dovishaw,Helene Farrell-Dovishaw,"University Heights, OH",131 Fins Up Ct.,375,285,,,,,
 7,1703,"Beach, Breeze",UC,Paul Fahrenkopf,Terry Fahrenkopf,"Alexandria, VA",109 Fins Up Ct.,371,306,,,,,
 7,1704,"Beach, Hammock",UC,Jennifer Hock,Trent Hock,"Lancaster, PA",97 Fins Up Ct.,367,329,,,,,
 7,1705,"Beach, Breeze Bay",UC,Becky Waters,John Waters,"Chino Hills, CA",77 Fins Up Ct.,362,347,,,,,
@@ -12,20 +12,20 @@
 7,1707,"Beach, Breeze Bay",UC,Christina Wright,Doug Wright,"Chapel Hill, NC",214 Ocean Hammock Loop,337,387,,,Y,,Spiked hot chocolate and light snacks  -  Cris and Doug Wright
 7,1708,"Beach, Cabana Bay",UC,Danielle Bowers,,"Denver, CO",234 Ocean Hammock Loop,313,392,,,,,
 7,1709,"Beach, Breeze Bay",UC,Jim Pidgeon,Pamela Dompier Pidgeon,"Dover, NH",248 Ocean Hammock Loop,291,399,,,,,
-7,1710,"Beach, Cabana Bay",UC,Debra Nash,Rick Nash,"Greenville, SC",260 Ocean Hammock Loop,269,410,,,Y,,Irish Crème shots and mini-pumpkin chocolate chip cookies  -  Debra Nash
+7,1710,"Beach, Cabana Bay",UC,Debra Nash,Rick Nash,"Greenville, SC",260 Ocean Hammock Loop,269,410,,,Y,,Irish Crème shots and mini-pumpkin chocolate chip cookies  -  Debra & Rick Nash / Tim and Cathy Brophy
 7,1711,"Beach, Breeze Bay",UC,Cathy Bair-Brophy,Tom Bair-Brophy,"Myrtle Beach, SC",278 Ocean Hammock Loop,250,423,,,,,
 7,1712,"Beach, Breeze",UC,Matthew Cook,Marla Cook,"Highlands Ranch, CO",292 Ocean Hammock Loop,233,443,,,Y,,"Spiked apple cider, Bailey's boozy s'mores and homemade doggy treats  -  Marla Cook"
 7,1713,"Beach, n/a",UC,,,,314 Ocean Hammock Loop,219,460,,,,,
 7,1714,"Beach, Breeze Bay",UC,Fran Gabriel,Paul Gabriel,"Freehold, NJ",334 Ocean Hammock Loop,207,485,,,,,
 7,1715,"Beach, Coconut",UC,Allen Neal,Debbvie Neal,"Lexington, SC",354 Ocean Hammock Loop,198,504,,,,,
-7,1716,"Beach, Cabana Bay",UC,Scott Custer,Debra Custer,"Littleton, CO",364 Ocean Hammock Loop,192,529,,,Y,,Drinks  -  
+7,1716,"Beach, Cabana Bay",UC,Scott Custer,Debra Custer,"Littleton, CO",364 Ocean Hammock Loop,192,529,,,Y,,Drinks  -  Scott Custer
 7,1717,"Beach, Cabana Bay",UC,Oscar Koehler,Rebecca Koehler,"Lake Norman, NC",382 Ocean Hammock Loop,189,553,,,,,
 7,1718,"Beach, Parrot",UC,Daniel Farge,Sharon Farge,"Lake Ronkonkoma, NY",398 Ocean Hammock Loop,189,575,,,,,
 7,1719,"Beach, Cabana Bay",UC,Mary Kostek Nicholson,Michael Nicholson,,418 Ocean Hammock Loop,192,600,,,Y,,Warm drinks and light snacks  -  Christine Turner
 7,1720,"Beach, Parrot",UC,Santina Despo,,"Monroe, NJ",434 Ocean Hammock Loop,199,622,,,,,
 7,1721,"Beach, Cabana Bay",UC,Terry Allinder,Teri Allinder,"Mesa, AZ",452 Ocean Hammock Loop,211,643,,,,,
 7,1722,"Beach, Parrot",UC,Jim Svitanek,Ellen Svitanek,"Cary, NC",470 Ocean Hammock Loop,215,662,,,,,
-7,1723,"Beach, Breeze Bay",UC,Robert Chittenden,Petra Chittenden,"Lancaster, SC",492 Ocean Hammock Loop,224,682,,,Y,,Drinks  -  
+7,1723,"Beach, Breeze Bay",UC,Robert Chittenden,Petra Chittenden,"Lancaster, SC",492 Ocean Hammock Loop,224,682,,,Y,,Drinks  -  Robert Chittenden
 7,1724,"Beach, Cabana",UC,Mark McClellan,Laura McClellan,"Ellijay, GA",514 Ocean Hammock Loop,231,707,,,Y,,Drinks  -  Laura McClellan
 7,1725,"Beach, Coconut",UC,Bob Schoeppner,Leann Schoeppner,"Seven Fields, PA",528 Ocean Hammock Loop,240,723,,,,,
 7,1726,"Beach, Breeze Bay",UC,Russell Polo,Sandra Polo,", NJ",552 Ocean Hammock Loop,247,744,,,,,
@@ -42,24 +42,24 @@
 7,1737,"Beach, Parrot",UC,Sandy Barravecchio,Santo Barravecchio,", NJ",712 Ocean Hammock Loop,432,829,,,,,
 7,1738,"Beach, Breeze",UC,Bill Loughlin,,"Fairfax, VA",736 Ocean Hammock Loop,453,828,,,,,
 7,1739,"Beach, Breeze Bay",UC,Claudia Brozda,Nick Brozda,"Perkasie, PA",754 Ocean Hammock Loop,475,822,,,Y,,Shots and light snacks  -  Claudia Brozda
-7,1740,"Beach, Cabana",UC,Tina McElwain,Andy McElwain,"Pickerington, OH",772 Ocean Hammock Loop,495,818,,,Y,,Drinks  -  
+7,1740,"Beach, Cabana",UC,Tina McElwain,Andy McElwain,"Pickerington, OH",772 Ocean Hammock Loop,495,818,,,Y,,Drinks  -  Tina McElwain
 7,1741,"Beach, Breeze Bay",UC,Jane Katz Messick,Paul Schwegel,"Pasadena, MD",778 Ocean Hammock Loop,516,815,,,,,
 7,1742,"Beach, n/a",UC,Helen Lipke,Ray Lipke,,782 Ocean Hammock Loop,536,811,,,,,
 7,1743,"Beach, Breeze Bay",UC,Colleen Marie,Tony Marie,"n/a, MI",786 Ocean Hammock Loop,558,809,,,,,
 7,1744,"Beach, Cabana Bay",UC,Aileen McGinnity,Dan McLaughlin,"Weymouth, MA",804 Ocean Hammock Loop,526,744,,,,,
 7,1745,"Beach, Parrot",UC,Ann Marie Starbrauck,Harry Starbrauck,"Jamison, PA",826 Ocean Hammock Loop,521,720,,,,,
 7,1746,"Beach, Breeze",UC,Mike Whitescarver,Mary Whitescarver,", MN",846 Ocean Hammock Loop,514,694,,,Y,,"Drinks, light snacks/chocolate bars  -  Mary Whitescarver/Stacy Anderson/Laurie Meyer"
-7,1747,"Beach, Coconut",UC,William Anderson,,"New Paltz, NY",868 Ocean Hammock Loop,508,676,,,Y,,Drinks  -  
-7,1748,"Beach, Coconut",UC,Joe Meyer,Laurie Meyer,"Chalfont, PA",894 Ocean Hammock Loop,499,644,,,Y,,
+7,1747,"Beach, Coconut",UC,William Anderson,,"New Paltz, NY",868 Ocean Hammock Loop,508,676,,,Y,,Drinks  -  Williamson Anderson
+7,1748,"Beach, Coconut",UC,Joe Meyer,Laurie Meyer,"Chalfont, PA",894 Ocean Hammock Loop,499,644,,,,,
 7,1749,"Beach, Breeze",UC,Hilda Mendez,Matilda Mendez-Keegan,"Nokomis, FL",918 Ocean Hammock Loop,494,618,,,,,
 7,1750,"Beach, Breeze",UC,Linda Gage,Don Gage,"Silver Creek, NY",34 Ocean Hammock Loop,477,559,,,,,
-7,1751,"Beach, Breeze",UC,Bob Gee,Laurie Gee,"Mars, PA",52 Ocean Hammock Loop,473,544,,,Y,,Drinks  -  
+7,1751,"Beach, Breeze",UC,Bob Gee,Laurie Gee,"Mars, PA",52 Ocean Hammock Loop,473,544,,,Y,,Drinks  -  Bob Gee
 7,1752,"Beach, Breeze Bay",UC,Frank Grippo,Elizabeth Grippo,"Monroe, NC",76 Ocean Hammock Loop,466,512,,,,,
 7,1753,"Beach, Parrot",UC,Carrie Shelton,Richard Shelton,"Falls Church, VA",96 Ocean Hammock Loop,460,494,,,,,
 7,1754,"Beach, Cabana Bay",UC,Rusty Arn,Cindy Arn,"Lees Summit, MO",116 Ocean Hammock Loop,454,473,,,,,
 7,1755,"Beach, Breeze",UC,Nancy Mancheski,,"Norwood, PA",134 Ocean Hammock Loop,447,452,,,Y,,"Holiday Skewer with cheese, pepperoni, & fruit, Praline crunch, cocktail meatballs  -  Nancy Mancheski/Lou & Amy Gagliardi/Lyla and Rory Perrodin"
 7,1756,"Beach, Cabana Bay",UC,Cyndi Kelly,Scott Kelly,"Clemson, SC",26 Fins Up Ct.,430,424,,,,,
-7,1757,"Beach, Breeze Bay",UC,Paul Vega,Cara Chiusano,"Centereach, NY",44 Fins Up Ct.,432,402,,,Y,,Drinks - Cynthia Kelly
+7,1757,"Beach, Breeze Bay",UC,Paul Vega,Cara Chiusano,"Centereach, NY",44 Fins Up Ct.,432,402,,,,,
 7,1758,"Beach, Breeze Bay",UC,Jeanette Sheedy,Tom Sheedy,"Bluffton, SC",64 Fins Up Ct.,434,378,,,,,
 7,1759,"Beach, Coconut",UC,John Wunsch,Evelyn Wunsch,"Kent Lakes, NY",82 Fins Up Ct.,438,359,,,,,
 7,1760,"Beach, Parrot",UC,Jeffrey Gay,Ellen Gay,"San Antonio, TX",102 Fins Up Ct.,443,334,,,,,
@@ -87,7 +87,7 @@
 7,1782,"Beach, Parrot",UC,Lou Gagliardi,Amy Gagliardi,"Victoria, MN",95 Ocean Hammock Loop,387,511,,,,,
 7,1783,"Beach, Breeze Bay",UC,john Brennan,joanne Brennan,"Staten Island, NY",75 Ocean Hammock Loop,391,533,,,,,
 7,1784,"Beach, Parrot",UC,Sharon Beavin,Bob Beavin,"Vancouver, WA",53 Ocean Hammock Loop,401,558,,,,,
-7,1785,"Beach, Cabana Bay",UC,Ruth Oliveto,Jim Oliveto,"Wheeling, WV",31 Ocean Hammock Loop,404,579,,,Y,,Pudding Shots - Ruth Oliveto
+7,1785,"Beach, Cabana Bay",UC,Ruth Oliveto,Jim Oliveto,"Wheeling, WV",31 Ocean Hammock Loop,404,579,,,Y,,Pudding shots  -  Ruth Oliveto
 7,1786,"Beach, Breeze",UC,Ron Konkol,Kathy Konkol,"Stevens Point, WI",15 Ocean Hammock Loop,409,598,,,,,
 7,1787,"Beach, Breeze",UC,Greg Badger,Cindy Badger,"Champaign, IL",937 Ocean Hammock Loop,414,618,,,,,
 7,1788,"Beach, Coconut",UC,Julie Donahue,Patrick Donahue,"Williamsburg, MI",919 Ocean Hammock Loop,420,639,,,,,
@@ -107,7 +107,7 @@
 7,1802,"Beach, Breeze",UC,Doran Adams,Elisa Adams,"Bailey, CO",203 Good Life Way,863,465,,,,,
 7,1803,"Beach, Breeze Bay",UC,Amy Moore,Cliff Carawan,"Clayton, NC",221 Good Life Way,881,469,,,,,
 7,1804,"Beach, n/a",UC,,,,283 Good Life Way,951,467,,,,,
-7,1805,"Beach, Coconut",UC,Clarissa Barth Kallander,Christopher Kallander,"Hollywood, FL",305 Good Life Way,976,471,,,Y,,Cinnamon Toast Crunch Shots / Candy Canes - larissa Kallander
+7,1805,"Beach, Coconut",UC,Clarissa Barth Kallander,Christopher Kallander,"Hollywood, FL",305 Good Life Way,976,471,,,,,
 7,1806,"Beach, Coconut",UC,Jeff Dean,Susan Dean,"Jacksonville, FL",321 Good Life Way,997,470,,,,,
 7,1807,"Beach, Parrot",UC,Mike Taber,Ellen Farrell,"Blue Point, NY",339 Good Life Way,1019,472,,,,,
 7,1808,"Beach, Coconut",UC,Kathy Hayes,Patrick Hayes,"n/a, CO",357 Good Life Way,1037,480,,,,,
@@ -134,7 +134,7 @@
 7,1829,"Beach, Coconut",UC,John Warkala,Cathy Warkala,"North Bellmore, NY",735 Good Life Way,1278,827,,,,,
 7,1830,"Beach, Hammock",UC,Kathy DeFore,Dave DeFore,"Castle Pines, CO",751 Good Life Way,1270,850,,,,,
 7,1831,"Beach, Cabana Bay",UC,Sharon Hite Treece,Chuck Hite Treece,"n/a, AL",771 Good Life Way,1261,866,,,,,
-7,1832,"Beach, Cabana Bay",UC,John (Jack) Cloninger,,"Ashville, NC",791 Good Life Way,1251,885,,,Y,,Peppermint Rum Chata and candy canes  -  LaNita Cloninger
+7,1832,"Beach, Cabana Bay",UC,John (Jack) Cloninger,,"Ashville, NC",791 Good Life Way,1251,885,,,Y,,PeppermintRum Chata and candy canes  -  LaNita Cloninger
 7,1833,"Beach, Breeze Bay",UC,Tony Campbell,Pam Campbell,"Johns Creek, GA",811 Good Life Way,1244,903,,,Y,,Drinks  -  Pamela Campbell
 7,1834,"Beach, Parrot",UC,Pam Thomson,Ron Thomson,"Valencia , PA",831 Good Life Way,1234,923,,,Y,,Drinks  -  Pam Thomson
 7,1835,"Beach, Coconut",UC,Carn D. Cahoon,John Cahoon,"Joppa, MD",857 Good Life Way,1223,950,,,,,
@@ -194,7 +194,7 @@
 7,1889,"Caribbean, Nevis",UC,Donna Tickner Luglio,E. Tickner,"West Chester, PA",1639 Good Life Way,707,1061,,,,,
 7,1890,"Caribbean, Antigua",UC,Roxanne Hagy,Matt Hagy,"Delran, NJ",1651 Good Life Way,709,1045,,,,,
 7,1891,"Caribbean, Antigua",UC,Nanette Donahue,Toccoa Gary,"n/a,",1669 Good Life Way,706,1029,,,,,
-7,1892,"Caribbean, Barbuda Bay",UC,Bill Godsey,Karol Godsey,", VA",1681 Good Life Way,707,1016,,,Y,,Candy Cane Shots - Karol Godsey
+7,1892,"Caribbean, Barbuda Bay",UC,Bill Godsey,Karol Godsey,", VA",1681 Good Life Way,707,1016,,,Y,,Candy Cane shots  -  Karol Godsey
 7,1893,"Caribbean, Barbuda",UC,Denise Dembeck,Staley Dembeck,"Bel Air, `MD",1701 Good Life Way,706,992,,,,,
 7,1894,"Caribbean, Tortola",UC,Dean Denham,Claire Denham,"Holly Springs, NC",1715 Good Life Way,703,978,,,,,
 7,1895,"Caribbean, Lucia",UC,Kerry Frerichs,Annette Frerichs,"Urbana, IL",1733 Good Life Way,705,962,,,,,
@@ -223,7 +223,7 @@
 7,1918,"Beach, Parrot",UC,Karen Lazar,,"Bethlehem, PA",2044 Good Life Way,721,614,,,,,
 7,1919,"Beach, Coconut",UC,Michael Wagner,Susan Wagner,"Marlton, NJ",2084 Good Life Way,713,587,,,Y,,Drinks  -  Maureen Celorier
 7,1920,"Beach, Coconut",UC,Mary Ellen Pugh,Sam Pugh,"Beckley, WV",66 Good Life Way,735,550,,,,,
-7,1921,"Beach, Breeze",UC,Cathy Weckel,George Weckel,"Dunkirk, MD",122 Good Life Way,774,545,,,Y,,Fireball Chocolate covered cherries - Cathy & George Weckel
+7,1921,"Beach, Breeze",UC,Cathy Weckel,George Weckel,"Dunkirk, MD",122 Good Life Way,774,545,,,,,
 7,1922,"Beach, Breeze",UC,Tim White,Janine White,"Mundelein, IL",142 Good Life Way,795,545,,,,,
 7,1923,"Beach, n/a",UC,,,,164 Good Life Way,819,542,,,,,
 7,1924,"Beach, Breeze",UC,William Hixson,Lisa Hisxon,"Germantown, MD",184 Good Life Way,839,546,,,,,
@@ -236,7 +236,7 @@
 7,1931,"Beach, Cabana Bay",UC,Maribeth Humphrey,Michael Humphrey,"N/A, NJ",326 Good Life Way,992,546,,,,,
 7,1932,"Beach, Coconut",UC,Nicky Farmer,Tracey Farmer,"Fredericksburg, VA",350 Good Life Way,1015,554,,,,,
 7,1933,"Beach, Cabana Bay",UC,George Preban,Kathy Preban,"Homer Glen, IL",382 Good Life Way,1037,559,,,,,
-7,1934,"Caribbean, Antigua",UC,Nicole Iannarone,Scott Stutcavage,", NJ",421 Seaplane Drive,1087,572,,,,,
+7,1934,"Caribbean, Antigua",UC,Nicole Iannarone,Scott Stutcavage,", NJ",421 Seaplane Drive,1087,572,,,Y,,"Spiked warm cider,  christmas crack ( sweet treat ) and  snack cups and venison sausage and cheese platter - Nicole Iannarone, Scotty Shots, Jim and Linda Alberico and Greg and Raelee Emslie"
 7,1935,"Caribbean, Barbuda Bay",UC,Greg Emslie,Raelee Emslie,"Cranberry Twp, PA",399 Seaplane Drive,1073,585,,,,,
 7,1936,"Caribbean, Nevis",UC,Jayna Patidar Dusel,Barbie Hobgood Patidar,"Columbia, SC",379 Seaplane Drive,1063,599,,,,,
 7,1937,"Caribbean, Antigua",UC,John Makuch,Patty Cahalin,"Woodbridge, NJ",371 Seaplane Drive,1054,611,,,,,
@@ -250,16 +250,16 @@
 7,1945,"Caribbean, Jamaica",UC,Marilyn Sestok,,"Macomb, MI",203 Seaplane Drive,925,676,,,,,
 7,1946,"Caribbean, Antigua",UC,John Costa,,"Medford, MA",187 Seaplane Drive,913,680,,,,,
 7,1947,"Caribbean, Nevis",UC,,,,177 Seaplane Drive,894,683,,,,,
-7,1948,"Caribbean, Antigua",UC,Louise Rademan,,"Antioch, IL",159 Seaplane Drive,881,687,,, ,, 
+7,1948,"Caribbean, Antigua",UC,Louise Rademan,,"Antioch, IL",159 Seaplane Drive,881,687,,,,,
 7,1949,"Caribbean, Barbuda Bay",UC,Christopher Soave,Sherri Sioave,"Ponte Vedra, FL",143 Seaplane Drive,862,688,,,,,
 7,1950,"Caribbean, n/a",UC,,,,129 Seaplane Drive,844,693,,,,,
 7,1951,"Caribbean, n/a",UC,Heidi Jentzsch,Scott McEuen,"Taylorsville, UT",117 Seaplane Drive,830,695,,,,,
 7,1952,"Caribbean, Tortola",UC,Audrey Murphy,Kevin Murphy,"Delmar, NY",95 Seaplane Drive,814,696,,,,,
 7,1953,"Caribbean, Nevis",UC,Lesli Eiland,,"Clarksville, TN",83 Seaplane Drive,797,703,,,,,
-7,1954,"Caribbean, Nevis",UC,Greg Mathison,Lisa Mathison,"Matthews, NC",69 Seaplane Drive,781,705,,,Y,,Holiday Shots / Pepermint Bark - Greg & Lisa Mathison / Lesli Eiland
+7,1954,"Caribbean, Nevis",UC,Greg Mathison,Lisa Mathison,"Matthews, NC",69 Seaplane Drive,781,705,,,,,
 7,1955,"Caribbean, Antigua",UC,Bobby Olinger,Lynn Olinger,"Puyallup, WA",55 Seaplane Drive,766,707,,,,,
 7,1956,"Caribbean, Nevis",UC,Rosann Nagle,,"Fallston, MD",39 Seaplane Drive,750,711,,,,,
-7,1957,"Caribbean, Antigua",UC,Ruth Ann Hess,Tom Hess,"Newark, OH",21 Seaplane Drive,728,713,,,Y,,Drinks & Light Snacks - Michelle Proser
+7,1957,"Caribbean, Antigua",UC,Ruth Ann Hess,Tom Hess,"Newark, OH",21 Seaplane Drive,728,713,,,,,
 7,1958,"Conch, Aloha",UC,,,,32 Seaplane Drive,751,772,,,,,
 7,1959,"Conch, Bamboo",UC,Bart Mahoney,Lynn Wescott,"Clifton, NJ",30 Seaplane Drive,753,788,,,,,
 7,1960,"Conch, Camellia",UC,Kathleen Rotchford Pimpinella,,"Oceanport, NJ",28 Seaplane Drive,756,802,,,,,
@@ -323,7 +323,7 @@
 7,2018,"Conch, Dreamsicle",UC,Bill Riemann,Jill Riemann,"Walterboro, SC",141 Salty Fin Drive,875,975,,,,,
 7,2019,"Conch, Bamboo",UC,Loida Dela Cruz Coughlin,John Coughlin,"Royersford, PA",143 Salty Fin Drive,877,998,,,,,
 7,2020,"Conch, Camellia",UC,Stacy Ellner,,"Stony Brook, NY",145 Salty Fin Drive,881,1011,,,,,
-7,2021,"Conch, Dreamsicle",UC,Greg Viebranz,Caroline Viebranz,"Worthington, OH",147 Salty Fin Drive,883,1025,,,Y,,Drinks/Light Snacks - Greg Viebranz
+7,2021,"Conch, Dreamsicle",UC,Greg Viebranz,Caroline Viebranz,"Worthington, OH",147 Salty Fin Drive,883,1025,,,,,
 7,2022,"Conch, Aloha",UC,Jim Brandenstein,Kathy Scurci,"Pittsburgh, PA",146 Salty Fin Drive,891,1066,,,,,
 7,2023,"Conch, Camellia",UC,,,",",144 Salty Fin Drive,894,1081,,,,,
 7,2024,"Conch, Camellia",UC,Matt Huss,,"Beaufort, SC",142 Salty Fin Drive,895,1096,,,,,
@@ -339,7 +339,7 @@
 7,2034,"Conch, Aloha",UC,Bob Hornak,Colleen Hornak,"NYC, NY",162 Salty Fin Drive,946,1106,,,,,
 7,2035,"Conch, Camellia",UC,,,",",164 Salty Fin Drive,943,1090,,,,,
 7,2036,"Conch, Camellia",UC,Rebecca Baird,Kevin Calandra,"Cincinnati, OH",166 Salty Fin Drive,942,1075,,,,,
-7,2037,"Conch, Aloha",UC,Lois Lane,Brad Lane,"Fort Meyers, FL",168 Salty Fin Drive,940,1056,,,Y,,"Mulled Wine / Fudge /Chocolate Diped Pretzels - Cindy and Ken Bond/Lois and Brad Lane, Kathy Scurci and Jim Bradenstein"
+7,2037,"Conch, Aloha",UC,Lois Lane,Brad Lane,"Fort Meyers, FL",168 Salty Fin Drive,940,1056,,,,,
 7,2038,"Conch, Aloha",UC,Cindy Bond,Ken Bond,"Colorado Springs, CO",167 Salty Fin Drive,930,1016,,,,,
 7,2039,"Conch, Bamboo",UC,,,",",165 Salty Fin Drive,928,1003,,,,,
 7,2040,"Conch, Parrot",UC,,,",",163 Salty Fin Drive,925,988,,,,,
@@ -355,7 +355,7 @@
 7,2050,"Conch, Aloha",UC,Mike Tuthill,Kathy Edwards Tuthill,"Hilton Head, SC",150 Seaplane Drive,888,793,,,,,
 7,2051,"Conch, Camellia",UC,Beth Rotchford,,"Belmar, NJ",152 Seaplane Drive,885,776,,,,,
 7,2052,"Conch, Bamboo",UC,,,",",154 Seaplane Drive,883,759,,,,,
-7,2053,"Conch, Dreamsicle",UC,Trish O'Connell,Jack Kelleher,"Victor, NY",156 Seaplane Drive,879,746,,,Y,,Christmas Cookie Shots - Trish O’Connell and Jack Kelleher/Lisa and Mike Ehrenberg/Brenda Reese/Gayle Gilbreth
+7,2053,"Conch, Dreamsicle",UC,Trish O'Connell,Jack Kelleher,"Victor, NY",156 Seaplane Drive,879,746,,,,,
 7,2054,"Conch, Dreamsicle",UC,Anne Marie Pfaff,,"Brick , NJ",196 Seaplane Drive,915,741,,,Y,,Fireball minis and min candy canes  -  Anne Pfaff
 7,2055,"Conch, Bamboo",UC,Meg Reid,,"Fishers, IN",194 Seaplane Drive,917,754,,,,,
 7,2056,"Conch, Camellia",UC,Karen Loftus,Steven Zaretsky,"Queens, NY",192 Seaplane Drive,920,769,,,,,
@@ -446,7 +446,7 @@
 7,2141,"Beach, Cabana Bay",UC,Janet Allonardo,Anthony Allonardo,"Bensalem, PA",242 Breathe Out Ave.,1065,901,,,Y,,Drinks  -  Janet Allonardo
 7,2142,"Beach, Parrot",UC,Carl Cinnelli,Kathy Cinnelli,"N/A, GA",264 Breathe Out Ave.,1060,878,,,,,
 7,2143,"Beach, Cabana Bay",UC,Kym Wells,Bryan Wells,"Fort Mill, SC",284 Breathe Out Ave.,1057,857,,,,,
-7,2144,"Beach, Parrot",UC,Jim Nasuti,Maria Nasuti,"Hilton Head, SC",306 Breathe Out Ave.,1053,836,,,Y,,Drinks - Maria Nasuti
+7,2144,"Beach, Parrot",UC,Jim Nasuti,Maria Nasuti,"Hilton Head, SC",306 Breathe Out Ave.,1053,836,,,,,
 7,2145,"Beach, Coconut",UC,Charlie Hitsman,Jeanne,"Matthews, NC",324 Breathe Out Ave.,1049,813,,,,,
 7,2146,"Beach, Coconut",UC,Jay Baker,Sue Baker,"Cumming, GA",344 Breathe Out Ave.,1045,794,,,,,
 7,2147,"Beach, Breeze Bay",UC,Ed Bryan,Kristin Bryan,"Lawrenceville, GA",366 Breathe Out Ave.,1040,764,,,,,

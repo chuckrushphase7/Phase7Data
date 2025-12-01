@@ -99,6 +99,27 @@ echo Mirrors updated.
 echo.
 echo [6/8] Auto-committing and pushing changes to GitHub ...
 
+pushd "%PHASE7DATA%"
+git add .
+git commit -m "Auto-build: %DATE% %TIME%"
+git push origin %GIT_BRANCH%
+popd
+
+echo.
+echo [7/8] Uploading APK to GitHub Release (tag %GITHUB_RELEASE_TAG%) ...
+
+if exist "%APK_REPO%" (
+   echo Uploading "%APK_REPO%" to release %GITHUB_RELEASE_TAG% ...    gh release upload "%GITHUB_RELEASE_TAG%" "%APK_REPO%" --clobber
+ ) else (
+   echo *** WARNING: APK not found at "%APK_REPO%". Skipping upload.
+)
+
+echo.
+echo [8/8] ALL DONE!
+pause
+
+
+Rem Old Statements
 rem pushd "%PHASE7DATA%"
 rem git add .
 rem git commit -m "Auto-build: %DATE% %TIME%"
@@ -114,7 +135,3 @@ rem    gh release upload "%GITHUB_RELEASE_TAG%" "%APK_REPO%" --clobber
 rem ) else (
 rem    echo *** WARNING: APK not found at "%APK_REPO%". Skipping upload.
 )
-
-echo.
-echo [8/8] ALL DONE!
-pause

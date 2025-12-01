@@ -117,31 +117,39 @@
     }
 
     /* Popup card */
-    #lotPopup {
-      position: absolute;
-      max-width: 260px;
-      background: #ffffff;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-      padding: 8px 10px;
-      font-size: 0.8rem;
-      z-index: 500;
+#lotPopup {
+  position: absolute;
+  max-width: 260px;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  z-index: 500;
 
-      max-height: 60vh;
-      overflow-y: auto;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      white-space: normal;
-    }
+  /* FIXES long text */
+  max-height: 60vh;
+  overflow-y: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 
-    @media (max-width: 768px) {
-      #lotPopup {
-        max-width: 60vw;
-        font-size: 0.7rem;
-        padding: 4px 6px;
-      }
-    }
+  /* Prevent popup from going behind header */
+  margin: 10px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 800px) {
+  #lotPopup {
+    left: 50% !important;
+    top: 20% !important;      /* <── THIS is the key fix */
+    transform: translateX(-50%);
+    max-width: 90vw;
+    max-height: 70vh;
+  }
+}
+
 
     #lotPopup.hidden {
       display: none;
