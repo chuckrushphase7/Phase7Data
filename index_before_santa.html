@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Phase 7 Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Detect Android WebView mode early to avoid flicker -->
+  <script>
+    (function () {
+      if (window.location.search.indexOf("android=1") !== -1) {
+        document.documentElement.classList.add("android-app");
+      }
+    })();
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+
+      /* Keep content out from under status bar / notches */
+      padding-top: constant(safe-area-inset-top);
+      padding-top: env(safe-area-inset-top);
+    }
+
+    header.top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: #111827;
+      color: #f9fafb;
+      margin-top: 4px;
+    }
+
+    .app-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+    }
+
+    .status-text {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    label.season-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    label.season-toggle span {
+      white-space: nowrap;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.1);
+    }
+
+    .link-button {
+      background: none;
+      border: none;
+      color: #93c5fd;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 2px 4px;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 8px;
+      gap: 8px;
+    }
+
+    .map-wrapper {
+      position: relative;
+      margin: 0 auto;
+      max-width: 100%;
+      overflow: auto;
+      background: #e5e7eb;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+    }
+
+    #mapCanvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Download bar */
+    #download-bar {
+      margin: 10px 0;
+      text-align: center;
+    }
+
+    /* Popup card */
+#lotPopup {
+  position: absolute;
+  max-width: 260px;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  z-index: 500;
+
+  /* FIXES long text */
+  max-height: 60vh;
+  overflow-y: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+
+  /* Prevent popup from going behind header */
+  margin: 10px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 800px) {
+  #lotPopup {
+    left: 50% !important;
+    top: 20% !important;      /* <── THIS is the key fix */
+    transform: translateX(-50%);
+    max-width: 90vw;
+    max-height: 70vh;
+  }
+}
+
+
+    #lotPopup.hidden {
+      display: none;
+    }
+
+    #lotPopup h3 {
+      margin: 0 0 4px 0;
+      font-size: 0.9rem;
+    }
+
+    .popup-close {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+    }
+
+    .popup-inner p {
+      margin: 2px 0;
+    }
+
+    @media (max-width: 600px) {
+      #lotPopup {
+        font-size: 0.75rem;
+      }
+      #lotPopup h3 {
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Privacy panel / modal */
+    .privacy-panel {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .privacy-panel.hidden {
+      display: none;
+    }
+
+    .privacy-content {
+      background: #ffffff;
+      max-width: 600px;
+      width: 90%;
+      padding: 16px 20px;
+      border-radius: 8px;
+      max-height: 80vh;
+      overflow-y: auto;
+      font-size: 0.9rem;
+    }
+
+    .privacy-content h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
+    .privacy-content ul {
+      padding-left: 20px;
+    }
+
+    .privacy-content button {
+      margin-top: 12px;
+      padding: 4px 10px;
+      font-size: 0.85rem;
+    }
+    /* Sprite overlay for animated icons (gator, etc.) */
+    /* Sprite overlay for animated icons (gator, etc.) */
+    #spriteLayer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none; /* clicks go through to the canvas */
+    }
+
+    /* Animated alligator sprite */
+    .alligator-sprite {
+      position: absolute;
+      font-size: 32px;
+      line-height: 1;
+      transform: translate(-50%, -50%);
+      animation: gatorBob 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes gatorBob {
+      0% {
+        transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translate(-50%, -50%) translateY(-4px) rotate(-4deg);
+      }
+      100% {
+        transform: translate(-50%, -50%) translateY(4px) rotate(4deg);
+      }
+    }
+
+
+
+
+    footer {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    /* ---------- ANDROID APP LAYOUT TWEAKS ---------- */
+    .android-app #download-bar,
+    .android-app #android-instructions,
+    .android-app #ios-instructions {
+      display: none !important;
+    }
+	/* Sprite overlay for animated icons */
+#spriteLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* clicks still go to the canvas */
+}
+
+/* Animated alligator sprite */
+.alligator-sprite {
+  position: absolute;
+  font-size: 32px;
+  line-height: 1;
+  /* We'll center it exactly on the event coordinates */
+  transform: translate(-50%, -50%);
+  animation: gatorBob 2.4s ease-in-out infinite alternate;
+}
+
+/* Little bob + wiggle */
+@keyframes gatorBob {
+  0% {
+    transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-4px) rotate(-4deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(4px) rotate(4deg);
+  }
+}
+/* Sprite overlay for animated icons (e.g., gator) */
+#spriteLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* clicks still go to canvas */
+}
+
+/* Animated alligator sprite (emoji-based) */
+.alligator-sprite {
+  position: absolute;
+  font-size: 32px;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  animation: gatorBob 2.4s ease-in-out infinite alternate;
+}
+
+/* Simple bob + wiggle */
+@keyframes gatorBob {
+  0% {
+    transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-4px) rotate(-4deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(4px) rotate(4deg);
+  }
+}
+
+
+  </style>
+</head>
+
+<body>
+  <header class="top-bar">
+    <div class="app-title">
+      <!-- Title removed here to avoid repetition in the app UI -->
+    </div>
+    <div class="top-bar-right">
+      <span id="lockStatus" class="status-text">
+        Seasonal
+      </span>
+      <label class="season-toggle">
+        <input type="checkbox" id="seasonOnlyCheckbox" checked />
+        <span id="seasonOnlyLabel">Residents</span>
+      </label>
+      <button id="privacyButton" class="link-button">Privacy</button>
+    </div>
+  </header>
+
+  <!-- Download buttons (hidden in Android app via .android-app class) -->
+  <div id="download-bar">
+    <a
+      id="apkDownloadButton"
+      href="https://github.com/chuckrushphase7/Phase7Data/releases/download/v1.0.0/Phase7Residents.apk"
+      style="
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1px solid #2563eb;
+        background: #2563eb;
+        color: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        margin-right: 8px;
+        text-decoration: none;
+        display: inline-block;
+      ">
+      Download Android App
+    </a>
+
+    <button
+      onclick="document.getElementById('ios-instructions')?.scrollIntoView({ behavior: 'smooth' });"
+      style="
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1px solid #6b7280;
+        background: white;
+        color: #374151;
+        font-size: 0.9rem;
+        cursor: pointer;
+      ">
+      iPhone / iPad Instructions
+    </button>
+  </div>
+
+
+  <main>
+<main>
+<main>
+<main>
+<main>
+<main>
+  <div class="map-wrapper" id="mapWrapper">
+    <canvas id="mapCanvas"></canvas>
+    <div id="lotPopup" class="hidden"></div>
+
+    <!-- Overlay layer for animated sprites like the gator -->
+    <div id="spriteLayer"></div>
+  </div>
+
+  <!-- Android install instructions -->
+  <section id="android-instructions" ...
+
+  ...
+</main>
+
+  ...
+</main>
+
+
+  <!-- Android install instructions -->
+  <section id="android-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+    ...
+
+  ...
+</main>
+
+    <!-- Android install instructions (hidden in Android app) -->
+    <section id="android-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+      <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">
+        Installing the Android App
+      </h2>
+
+      <p style="font-size: 0.9rem; margin-bottom: 6px;">
+        The Android version of the Phase 7 Neighborhood Map is installed from an <code>.apk</code> file.
+        Follow these steps on your Android phone or tablet:
+      </p>
+
+      <ol style="font-size: 0.88rem; padding-left: 20px; line-height: 1.4;">
+        <li>Tap the <strong>Download Android App</strong> button above.</li>
+        <li>Your browser may warn that this type of file can harm your device. This is a standard warning for apps installed from outside the Play Store.</li>
+        <li>Tap <strong>Download</strong> or <strong>Download anyway</strong> to continue.</li>
+        <li>When the download finishes, tap the notification, or open your <strong>Downloads</strong> app and select <code>Phase7Residents.apk</code>.</li>
+        <li>If prompted, allow your browser or file manager to install apps from this source.</li>
+        <li>Tap <strong>Install</strong>, then <strong>Open</strong> to launch the Phase 7 app.</li>
+      </ol>
+
+      <p style="font-size: 0.85rem; margin-top: 8px; color: #444;">
+        After installation, you can open the Phase 7 app from your home screen like any other app.
+      </p>
+    </section>
+
+    <!-- iOS instructions (hidden in Android app) -->
+    <section id="ios-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+      <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">
+        Using Phase 7 on iPhone / iPad
+      </h2>
+
+      <p style="font-size: 0.9rem; margin-bottom: 6px;">
+        The Phase 7 Neighborhood Map runs as a mobile website on Apple devices. You can add it to your Home Screen so it behaves just like an app:
+      </p>
+
+      <ol style="font-size: 0.88rem; padding-left: 20px; line-height: 1.4;">
+        <li>Open this page in Safari on your iPhone or iPad.</li>
+        <li>Tap the <strong>Share</strong> icon (square with an arrow).</li>
+        <li>Scroll down and choose <strong>Add to Home Screen</strong>.</li>
+        <li>Enter a name like <em>Phase 7 Map</em> and tap <strong>Add</strong>.</li>
+      </ol>
+
+      <p style="font-size: 0.85rem; margin-top: 8px; color: #444;">
+        Once added, it will open full-screen with its own icon just like a native app.
+      </p>
+    </section>
+  </main>
+
+  <!-- Admin / Debug Panel (visible with ?admin=1) -->
+  <section id="admin-panel" style="display:none; margin: 20px auto; max-width: 800px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+    <h2 style="font-size: 1.05rem; margin-bottom: 8px; text-align: center;">
+      Admin / Debug View
+    </h2>
+    <p style="font-size: 0.85rem; color: #555; text-align: center;">
+      This panel appears only when the URL includes <code>?admin=1</code>.
+    </p>
+
+    <div id="admin-summary" style="font-size: 0.85rem; margin-bottom: 10px;"></div>
+
+    <label for="admin-events-json" style="font-size: 0.8rem; font-weight: 600; display:block; margin: 8px 0 4px;">
+      EVENTS JSON (read-only)
+    </label>
+    <textarea
+      id="admin-events-json"
+      readonly
+      style="width: 100%; height: 220px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 0.8rem; padding: 6px; border-radius: 4px; border: 1px solid #d1d5db; background: #f9fafb;"></textarea>
+  </section>
+
+  <footer>
+    This map is for Phase 7 residents. Seasonal view hides personal information by default.
+  </footer>
+
+  <!-- Privacy modal -->
+  <div id="privacyPanel" class="privacy-panel hidden">
+    <div class="privacy-content">
+      <h2>Privacy &amp; Data Use</h2>
+      <p>
+        This map is provided for residents of Phase 7 for neighborhood reference and seasonal displays.
+        It does not send or share your data with any online service.
+      </p>
+      <ul>
+        <li>By default, the map only shows seasonal stations (like <em>Holiday Season</em> displays).</li>
+        <li>Names, addresses, phone numbers, and other personal details are hidden in the default view.</li>
+        <li>Full resident information is only shown after entering a password, intended for internal community use.</li>
+        <li>Certain homes may be flagged as sensitive, and their details are limited even in the unlocked view.</li>
+      </ul>
+      <p>
+        If you have questions or want your information removed or changed, please contact the Phase 7 coordinators.
+      </p>
+      <button id="privacyCloseButton">Close</button>
+    </div>
+  </div>
+
+  <!-- Data and logic files -->
+  <script src="phase7_merged_lots.js"></script>
+  <script src="mapped_sites.js"></script>
+  <script src="apk_info.js"></script>
+  <script src="events.js"></script>
+
+  <script src="draw_sites.js"></script>
+  <script src="event_engine.js"></script>
+  <script src="draw_lots.js"></script>
+  <script src="map_core.js"></script>
+</body>
+</html>
