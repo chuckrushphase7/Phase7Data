@@ -123,11 +123,11 @@ Rem Old Statements
 rem pushd "%PHASE7DATA%"
 rem git add .
 rem git commit -m "Auto-build: %DATE% %TIME%"
-git push origin %GIT_BRANCH%
+rem git push origin %GIT_BRANCH%
 rem popd
 
-echo.
-echo [7/8] Uploading APK to GitHub Release (tag %GITHUB_RELEASE_TAG%) ...
+rem echo.
+rem echo [7/8] Uploading APK to GitHub Release (tag %GITHUB_RELEASE_TAG%) ...
 
 rem if exist "%APK_REPO%" (
 rem    echo Uploading "%APK_REPO%" to release %GITHUB_RELEASE_TAG% ...
