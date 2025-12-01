@@ -132,8 +132,18 @@ function fetchPassword() {
 // Filtering helpers
 // ------------------------
 function isSeasonStation(lotOrEvent) {
-  return !!lotOrEvent && !!lotOrEvent.seasonStation;
+  if (!lotOrEvent) return false;
+
+  // Treat either a true seasonStation flag OR non-empty seasonDetails text
+  // as a "season station" for the Holiday / event view.
+  const hasFlag = !!lotOrEvent.seasonStation;
+  const hasDetails =
+    typeof lotOrEvent.seasonDetails === "string" &&
+    lotOrEvent.seasonDetails.trim().length > 0;
+
+  return hasFlag || hasDetails;
 }
+
 
 function getSeasonDetails(lotOrEvent) {
   return lotOrEvent && lotOrEvent.seasonDetails
