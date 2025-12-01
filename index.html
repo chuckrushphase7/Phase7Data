@@ -2,206 +2,121 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Phase 7 Residents</title>
+  <title>Phase 7 Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Detect Android WebView mode early to avoid flicker -->
+  <script>
+    (function () {
+      if (window.location.search.indexOf("android=1") !== -1) {
+        document.documentElement.classList.add("android-app");
+      }
+    })();
+  </script>
 
   <style>
     * {
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #f3f4f6;
       color: #111827;
-    }
-
-    .app-shell {
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+
+      /* Keep content out from under status bar / notches */
+      padding-top: constant(safe-area-inset-top);
+      padding-top: env(safe-area-inset-top);
     }
 
-    header {
-      background: #111827;
-      color: #f9fafb;
-      padding: 6px 10px;
+    header.top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-    }
-
-    .header-left {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .header-title {
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .header-subtitle {
-      font-size: 0.78rem;
-      color: #e5e7eb;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .controls {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      padding: 6px 10px;
       background: #111827;
-      border-radius: 999px;
-      border: 1px solid #4b5563;
-      padding: 2px 8px;
-      font-size: 0.7rem;
+      color: #f9fafb;
+      margin-top: 4px;
     }
 
-    .badge span {
-      white-space: nowrap;
+    .app-title {
+      font-weight: 600;
+      font-size: 1rem;
     }
 
-    .badge-label {
-      opacity: 0.85;
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
     }
 
-    .toggle-wrapper {
+    .status-text {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    label.season-toggle {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      font-size: 0.78rem;
-    }
-
-    .toggle-wrapper input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-    }
-
-    .apk-button {
-      font-size: 0.75rem;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-      color: #111827;
       cursor: pointer;
+    }
+
+    label.season-toggle span {
       white-space: nowrap;
     }
 
-    .apk-button:hover {
-      background: #e5e7eb;
+    input[type="checkbox"] {
+      transform: scale(1.1);
     }
 
-    .privacy-badge {
-      font-size: 0.7rem;
-      padding: 3px 6px;
-      border-radius: 999px;
-      border: 1px solid #f97316;
-      background: #1f2937;
-      color: #fed7aa;
+    .link-button {
+      background: none;
+      border: none;
+      color: #93c5fd;
+      text-decoration: underline;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .privacy-badge span {
-      white-space: nowrap;
+      font-size: 0.8rem;
+      padding: 2px 4px;
     }
 
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
+      padding: 8px;
+      gap: 8px;
     }
 
     .map-wrapper {
-      flex: 1;
       position: relative;
-      background: #000000;
+      margin: 0 auto;
+      max-width: 100%;
+      overflow: auto;
+      background: #e5e7eb;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
     }
 
-    #phase7Canvas {
-      width: 100%;
-      height: 100%;
+    #mapCanvas {
       display: block;
-      background: #000000;
+      max-width: 100%;
+      height: auto;
     }
 
-    .legend-panel {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      background: rgba(17, 24, 39, 0.92);
-      color: #e5e7eb;
-      font-size: 0.75rem;
-      padding: 6px 8px;
-      border-radius: 6px;
-      max-width: 220px;
-      z-index: 200;
+    /* Download bar */
+    #download-bar {
+      margin: 10px 0;
+      text-align: center;
     }
 
-    .legend-panel h3 {
-      margin: 0 0 4px 0;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #f9fafb;
-    }
-
-    .legend-panel ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .legend-panel li {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 3px;
-    }
-
-    .legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      flex-shrink: 0;
-    }
-
-    .legend-dot-season {
-      background: #f97316;
-    }
-
-    .legend-dot-resident {
-      background: #3b82f6;
-    }
-
-    .legend-note {
-      margin-top: 4px;
-      font-size: 0.7rem;
-      color: #9ca3af;
-    }
-
-    /* Popup card – scrollable & mobile-safe */
+    /* Popup card */
     #lotPopup {
       position: absolute;
       max-width: 260px;
@@ -218,11 +133,14 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
       white-space: normal;
+    }
 
-      bottom: auto;
-      top: auto;
-      margin: 10px;
-      box-sizing: border-box;
+    @media (max-width: 768px) {
+      #lotPopup {
+        max-width: 60vw;
+        font-size: 0.7rem;
+        padding: 4px 6px;
+      }
     }
 
     #lotPopup.hidden {
@@ -234,93 +152,20 @@
       font-size: 0.9rem;
     }
 
-    .popup-inner p {
-      margin: 2px 0;
-    }
-
     .popup-close {
       margin-top: 6px;
       font-size: 0.75rem;
       padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid #d1d5db;
-      background: #f3f4f6;
     }
 
-    .popup-close:hover {
-      background: #e5e7eb;
+    .popup-inner p {
+      margin: 2px 0;
     }
 
-    .apk-info {
-      font-size: 0.68rem;
-      color: #d1d5db;
-      margin-left: 4px;
-    }
-
-    footer {
-      font-size: 0.7rem;
-      padding: 4px 8px;
-      text-align: center;
-      color: #6b7280;
-      background: #f9fafb;
-    }
-
-    /* Header layout tweaks on small screens */
-    @media (max-width: 640px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
-
-      .header-right {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .controls {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .header-subtitle {
-        font-size: 0.7rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .header-right {
-        flex-wrap: wrap;
-        row-gap: 4px;
-      }
-
-      .apk-button {
-        font-size: 0.7rem;
-        padding: 2px 6px;
-      }
-
-      .badge {
-        font-size: 0.65rem;
-      }
-
-      .privacy-badge {
-        font-size: 0.65rem;
-      }
-    }
-
-    @media (max-width: 800px) {
-      #lotPopup {
-        left: 50% !important;
-        top: 20% !important;
-        transform: translateX(-50%);
-        max-width: 90vw;
-        max-height: 70vh;
-      }
-
+    @media (max-width: 600px) {
       #lotPopup {
         font-size: 0.75rem;
       }
-
       #lotPopup h3 {
         font-size: 0.85rem;
       }
@@ -345,173 +190,320 @@
       background: #ffffff;
       max-width: 600px;
       width: 90%;
-      padding: 16px;
-      border-radius: 10px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-      font-size: 0.85rem;
+      padding: 16px 20px;
+      border-radius: 8px;
+      max-height: 80vh;
+      overflow-y: auto;
+      font-size: 0.9rem;
     }
 
     .privacy-content h2 {
       margin-top: 0;
       margin-bottom: 8px;
-      font-size: 1rem;
     }
 
-    .privacy-content p {
-      margin: 4px 0;
-      line-height: 1.3;
+    .privacy-content ul {
+      padding-left: 20px;
     }
 
-    .privacy-buttons {
-      margin-top: 10px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-
-    .btn {
-      font-size: 0.8rem;
+    .privacy-content button {
+      margin-top: 12px;
       padding: 4px 10px;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      background: #f9fafb;
-      cursor: pointer;
-    }
-
-    .btn.primary {
-      background: #111827;
-      color: #f9fafb;
-      border-color: #111827;
-    }
-
-    .btn.primary:hover {
-      background: #1f2937;
-    }
-
-    .btn.secondary:hover {
-      background: #e5e7eb;
-    }
-
-    .unlock-row {
-      margin-top: 10px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .unlock-row input[type="password"] {
-      flex: 1;
-      padding: 4px 8px;
       font-size: 0.85rem;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
     }
+    /* Sprite overlay for animated icons (gator, etc.) */
+    /* Sprite overlay for animated icons (gator, etc.) */
+    #spriteLayer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none; /* clicks go through to the canvas */
+    }
+
+    /* Animated alligator sprite */
+    .alligator-sprite {
+      position: absolute;
+      font-size: 32px;
+      line-height: 1;
+      transform: translate(-50%, -50%);
+      animation: gatorBob 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes gatorBob {
+      0% {
+        transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translate(-50%, -50%) translateY(-4px) rotate(-4deg);
+      }
+      100% {
+        transform: translate(-50%, -50%) translateY(4px) rotate(4deg);
+      }
+    }
+
+
+
+
+    footer {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    /* ---------- ANDROID APP LAYOUT TWEAKS ---------- */
+    .android-app #download-bar,
+    .android-app #android-instructions,
+    .android-app #ios-instructions {
+      display: none !important;
+    }
+	/* Sprite overlay for animated icons */
+#spriteLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* clicks still go to the canvas */
+}
+
+/* Animated alligator sprite */
+.alligator-sprite {
+  position: absolute;
+  font-size: 32px;
+  line-height: 1;
+  /* We'll center it exactly on the event coordinates */
+  transform: translate(-50%, -50%);
+  animation: gatorBob 2.4s ease-in-out infinite alternate;
+}
+
+/* Little bob + wiggle */
+@keyframes gatorBob {
+  0% {
+    transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-4px) rotate(-4deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(4px) rotate(4deg);
+  }
+}
+/* Sprite overlay for animated icons (e.g., gator) */
+#spriteLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* clicks still go to canvas */
+}
+
+/* Animated alligator sprite (emoji-based) */
+.alligator-sprite {
+  position: absolute;
+  font-size: 32px;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  animation: gatorBob 2.4s ease-in-out infinite alternate;
+}
+
+/* Simple bob + wiggle */
+@keyframes gatorBob {
+  0% {
+    transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-4px) rotate(-4deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(4px) rotate(4deg);
+  }
+}
+
+
   </style>
 </head>
+
 <body>
-  <div class="app-shell">
-    <header>
-      <div class="header-left">
-        <div class="header-title">Phase 7 Residents</div>
-        <div class="header-subtitle">
-          <span id="currentSeasonName">Holiday Season</span> • Latitude Margaritaville Hilton Head
-        </div>
-      </div>
-      <div class="header-right">
-        <div class="controls">
-          <div class="badge">
-            <span class="badge-label">View Mode:</span>
-            <span id="seasonToggleLabel">Locked View</span>
-          </div>
-          <div class="toggle-wrapper">
-            <input type="checkbox" id="seasonToggleCheckbox" checked />
-            <label for="seasonToggleCheckbox">Season Only</label>
-          </div>
-        </div>
-        <div class="controls">
-          <button class="privacy-badge">
-            <span>Privacy & Unlock</span>
-          </button>
-          <button id="apkButton" class="apk-button">Download Android App</button>
-        </div>
-      </div>
-    </header>
+  <header class="top-bar">
+    <div class="app-title">
+      <!-- Title removed here to avoid repetition in the app UI -->
+    </div>
+    <div class="top-bar-right">
+      <span id="lockStatus" class="status-text">
+        Seasonal
+      </span>
+      <label class="season-toggle">
+        <input type="checkbox" id="seasonOnlyCheckbox" checked />
+        <span id="seasonOnlyLabel">Residents</span>
+      </label>
+      <button id="privacyButton" class="link-button">Privacy</button>
+    </div>
+  </header>
 
-    <main>
-      <div class="map-wrapper" id="mapWrapper">
-        <canvas id="phase7Canvas"></canvas>
+  <!-- Download buttons (hidden in Android app via .android-app class) -->
+  <div id="download-bar">
+    <a
+      id="apkDownloadButton"
+      href="https://github.com/chuckrushphase7/Phase7Data/releases/download/v1.0.0/Phase7Residents.apk"
+      style="
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1px solid #2563eb;
+        background: #2563eb;
+        color: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        margin-right: 8px;
+        text-decoration: none;
+        display: inline-block;
+      ">
+      Download Android App
+    </a>
 
-        <!-- Legend -->
-        <div class="legend-panel">
-          <h3>Map Legend</h3>
-          <ul>
-            <li>
-              <span class="legend-dot legend-dot-season"></span>
-              <span>Season station / event</span>
-            </li>
-            <li>
-              <span class="legend-dot legend-dot-resident"></span>
-              <span>Resident lot</span>
-            </li>
-          </ul>
-          <div class="legend-note">
-            In privacy mode, only seasonal stations show details.
-          </div>
-        </div>
-
-        <!-- Popup -->
-        <div id="lotPopup" class="hidden"></div>
-      </div>
-    </main>
-
-    <footer>
-      Phase 7 Residents • Map & data from Phase7Data
-      <span id="apkInfo" class="apk-info"></span>
-    </footer>
+    <button
+      onclick="document.getElementById('ios-instructions')?.scrollIntoView({ behavior: 'smooth' });"
+      style="
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1px solid #6b7280;
+        background: white;
+        color: #374151;
+        font-size: 0.9rem;
+        cursor: pointer;
+      ">
+      iPhone / iPad Instructions
+    </button>
   </div>
 
-  <!-- Privacy / unlock modal -->
-  <div class="privacy-panel hidden">
+
+  <main>
+<main>
+<main>
+<main>
+<main>
+<main>
+  <div class="map-wrapper" id="mapWrapper">
+    <canvas id="mapCanvas"></canvas>
+    <div id="lotPopup" class="hidden"></div>
+
+    <!-- Overlay layer for animated sprites like the gator -->
+    <div id="spriteLayer"></div>
+  </div>
+
+  <!-- Android install instructions -->
+  <section id="android-instructions" ...
+
+  ...
+</main>
+
+  ...
+</main>
+
+
+  <!-- Android install instructions -->
+  <section id="android-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+    ...
+
+  ...
+</main>
+
+    <!-- Android install instructions (hidden in Android app) -->
+    <section id="android-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+      <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">
+        Installing the Android App
+      </h2>
+
+      <p style="font-size: 0.9rem; margin-bottom: 6px;">
+        The Android version of the Phase 7 Neighborhood Map is installed from an <code>.apk</code> file.
+        Follow these steps on your Android phone or tablet:
+      </p>
+
+      <ol style="font-size: 0.88rem; padding-left: 20px; line-height: 1.4;">
+        <li>Tap the <strong>Download Android App</strong> button above.</li>
+        <li>Your browser may warn that this type of file can harm your device. This is a standard warning for apps installed from outside the Play Store.</li>
+        <li>Tap <strong>Download</strong> or <strong>Download anyway</strong> to continue.</li>
+        <li>When the download finishes, tap the notification, or open your <strong>Downloads</strong> app and select <code>Phase7Residents.apk</code>.</li>
+        <li>If prompted, allow your browser or file manager to install apps from this source.</li>
+        <li>Tap <strong>Install</strong>, then <strong>Open</strong> to launch the Phase 7 app.</li>
+      </ol>
+
+      <p style="font-size: 0.85rem; margin-top: 8px; color: #444;">
+        After installation, you can open the Phase 7 app from your home screen like any other app.
+      </p>
+    </section>
+
+    <!-- iOS instructions (hidden in Android app) -->
+    <section id="ios-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+      <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">
+        Using Phase 7 on iPhone / iPad
+      </h2>
+
+      <p style="font-size: 0.9rem; margin-bottom: 6px;">
+        The Phase 7 Neighborhood Map runs as a mobile website on Apple devices. You can add it to your Home Screen so it behaves just like an app:
+      </p>
+
+      <ol style="font-size: 0.88rem; padding-left: 20px; line-height: 1.4;">
+        <li>Open this page in Safari on your iPhone or iPad.</li>
+        <li>Tap the <strong>Share</strong> icon (square with an arrow).</li>
+        <li>Scroll down and choose <strong>Add to Home Screen</strong>.</li>
+        <li>Enter a name like <em>Phase 7 Map</em> and tap <strong>Add</strong>.</li>
+      </ol>
+
+      <p style="font-size: 0.85rem; margin-top: 8px; color: #444;">
+        Once added, it will open full-screen with its own icon just like a native app.
+      </p>
+    </section>
+  </main>
+
+  <!-- Admin / Debug Panel (visible with ?admin=1) -->
+  <section id="admin-panel" style="display:none; margin: 20px auto; max-width: 800px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
+    <h2 style="font-size: 1.05rem; margin-bottom: 8px; text-align: center;">
+      Admin / Debug View
+    </h2>
+    <p style="font-size: 0.85rem; color: #555; text-align: center;">
+      This panel appears only when the URL includes <code>?admin=1</code>.
+    </p>
+
+    <div id="admin-summary" style="font-size: 0.85rem; margin-bottom: 10px;"></div>
+
+    <label for="admin-events-json" style="font-size: 0.8rem; font-weight: 600; display:block; margin: 8px 0 4px;">
+      EVENTS JSON (read-only)
+    </label>
+    <textarea
+      id="admin-events-json"
+      readonly
+      style="width: 100%; height: 220px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 0.8rem; padding: 6px; border-radius: 4px; border: 1px solid #d1d5db; background: #f9fafb;"></textarea>
+  </section>
+
+  <footer>
+    This map is for Phase 7 residents. Seasonal view hides personal information by default.
+  </footer>
+
+  <!-- Privacy modal -->
+  <div id="privacyPanel" class="privacy-panel hidden">
     <div class="privacy-content">
-      <h2>Resident Map Privacy & Unlock</h2>
+      <h2>Privacy &amp; Data Use</h2>
       <p>
-        This map contains resident names, home details, and event information for the
-        Phase 7 neighborhood in Latitude Margaritaville Hilton Head.
+        This map is provided for residents of Phase 7 for neighborhood reference and seasonal displays.
+        It does not send or share your data with any online service.
       </p>
+      <ul>
+        <li>By default, the map only shows seasonal stations (like <em>Holiday Season</em> displays).</li>
+        <li>Names, addresses, phone numbers, and other personal details are hidden in the default view.</li>
+        <li>Full resident information is only shown after entering a password, intended for internal community use.</li>
+        <li>Certain homes may be flagged as sensitive, and their details are limited even in the unlocked view.</li>
+      </ul>
       <p>
-        By default, the map is in <strong>Season-Only</strong> mode. In this mode, only
-        special event stations are highlighted with details. This protects resident privacy
-        when the map is shown publicly.
+        If you have questions or want your information removed or changed, please contact the Phase 7 coordinators.
       </p>
-      <p>
-        To view full resident details (names, addresses, and notes) on lots, you can unlock
-        the map with the community password. This should only be used by authorized residents
-        and is for <strong>internal neighborhood use only</strong>.
-      </p>
-
-      <div class="unlock-row">
-        <input
-          type="password"
-          id="unlockPasswordInput"
-          placeholder="Enter community password"
-        />
-        <button class="btn primary" id="unlockButton">Unlock</button>
-      </div>
-
-      <div class="privacy-buttons">
-        <button class="btn secondary" id="unlockCancel">Close</button>
-      </div>
+      <button id="privacyCloseButton">Close</button>
     </div>
   </div>
 
-  <!-- Data + logic scripts -->
+  <!-- Data and logic files -->
   <script src="phase7_merged_lots.js"></script>
   <script src="mapped_sites.js"></script>
-  <script src="draw_sites.js"></script>
-  <script src="draw_lots.js"></script>
+  <script src="apk_info.js"></script>
   <script src="events.js"></script>
+
+  <script src="draw_sites.js"></script>
   <script src="event_engine.js"></script>
-  <script src="snow.js"></script>
+  <script src="draw_lots.js"></script>
   <script src="map_core.js"></script>
 </body>
 </html>
