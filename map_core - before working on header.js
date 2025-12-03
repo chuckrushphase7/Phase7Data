@@ -30,18 +30,16 @@ function getSeasonIcon(name) {
 function updateSeasonToggleLabel() {
   const span = document.getElementById("seasonOnlyLabel");
   if (!span) return;
-
-  // Per request: keep this label stable and simple
-  span.textContent = "Residents";
+  const icon = getSeasonIcon(currentSeasonName);
+  span.textContent = icon + " " + currentSeasonName + " Only";
 }
 
 function updateLockStatusUI() {
   const el = document.getElementById("lockStatus");
   if (!el) return;
-
-  // Per request: show constant centered phrase in the sticky bar
-el.textContent = "Latitude Margaritaville Hilton Head";
-
+  el.textContent = isUnlocked
+    ? "Full map unlocked (session only)"
+    : "Season view only (privacy mode)";
 }
 
 // ------------------------
@@ -53,9 +51,6 @@ function fetchSeasonName() {
     .then(function (text) {
       const trimmed = text.trim();
       if (trimmed) currentSeasonName = trimmed;
-
-      // We still load the season name for internal logic/popups,
-      // but we keep the toggle label text as "Residents".
       updateSeasonToggleLabel();
     })
     .catch(function () {
@@ -91,6 +86,7 @@ function handleAndroidDownloadClick() {
   window.location.href = "https://chuckrushphase7.github.io/Phase7Data/Phase7Residents.apk";
 }
 window.handleAndroidDownloadClick = handleAndroidDownloadClick;
+
 
 // ------------------------
 // Privacy panel
@@ -343,38 +339,27 @@ function setupSeasonToggle() {
   const checkbox = document.getElementById("seasonOnlyCheckbox");
   if (!checkbox) return;
 
-  // Default: Seasonal (unchecked means seasonal, checked means residents)
-  checkbox.checked = false;
-  isSeasonOnly = true;
-  updateSeasonToggleLabel();
-
   checkbox.addEventListener("change", function () {
-    // checked means switching to Residents (unlocked content)
-    if (checkbox.checked) {
-      if (!isUnlocked) {
-        const entered = window.prompt("Enter password to view more details:");
-        if (entered === PASSWORD) {
-          isUnlocked = true;
-          isSeasonOnly = false; // Residents
-        } else {
-          alert("Incorrect password. Staying in seasonal mode.");
-          checkbox.checked = false; // back to Seasonal
-          isSeasonOnly = true;
-        }
+    if (!isUnlocked && !checkbox.checked) {
+      const entered = window.prompt("Enter password to unlock full map:");
+      if (entered === PASSWORD) {
+        isUnlocked = true;
+        isSeasonOnly = false;
       } else {
-        isSeasonOnly = false; // Residents
+        alert("Incorrect password. Staying in seasonal privacy mode.");
+        checkbox.checked = true;
+        isSeasonOnly = true;
       }
-    } else {
-      // unchecked means Seasonal mode
-      isSeasonOnly = true;
+      updateLockStatusUI();
+      drawLots();
+      return;
     }
 
+    isSeasonOnly = checkbox.checked;
     updateLockStatusUI();
-    updateSeasonToggleLabel();
     drawLots();
   });
 }
-
 
 // ------------------------
 // Map init

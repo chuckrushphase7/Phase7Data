@@ -30,15 +30,18 @@
       padding-top: env(safe-area-inset-top);
     }
 
-    header.top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 10px;
-      background: #111827;
-      color: #f9fafb;
-      margin-top: 4px;
-    }
+header.top-bar {
+  position: relative; /* <-- IMPORTANT for centered overlay */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #111827;
+  color: #f9fafb;
+  margin-top: 4px;
+}
+
+
 
     .app-title { font-weight: 600; font-size: 1rem; }
 
@@ -49,7 +52,28 @@
       font-size: 0.85rem;
     }
 
-    .status-text { font-size: 0.8rem; opacity: 0.9; }
+.status-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+
+  padding: 4px 12px;
+  border-radius: 999px;
+
+  background: #065f46;      /* green */
+  border: 1px solid #34d399; /* mint border */
+  color: #ecfdf5;
+
+  pointer-events: none; /* so it won't block clicks */
+  white-space: nowrap;
+}
+
+
 
     label.season-toggle {
       display: inline-flex;
@@ -211,17 +235,23 @@
 </head>
 
 <body>
-  <header class="top-bar">
-    <div class="app-title"><!-- Title removed here to avoid repetition in the app UI --></div>
-    <div class="top-bar-right">
-      <span id="lockStatus" class="status-text">Seasonal</span>
-      <label class="season-toggle">
-        <input type="checkbox" id="seasonOnlyCheckbox" checked />
-        <span id="seasonOnlyLabel">Residents</span>
-      </label>
-      <button id="privacyButton" class="link-button">Privacy</button>
-    </div>
-  </header>
+<header class="top-bar">
+  <div class="app-title">
+    <div class="app-title-main">Phase 7</div>
+
+  </div>
+
+  <span id="lockStatus" class="status-text">LMHH Phase 7</span>
+
+  <div class="top-bar-right">
+    <label class="season-toggle">
+      <input type="checkbox" id="seasonOnlyCheckbox" />
+      <span id="seasonOnlyLabel">Seasonal</span>
+    </label>
+    <button id="privacyButton" class="link-button">Privacy</button>
+  </div>
+</header>
+
 
   <!-- Download buttons (hidden in Android app via .android-app class) -->
   <div id="download-bar">
