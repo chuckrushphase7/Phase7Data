@@ -748,7 +748,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks  -"
+    "christmasStationDetails": "Merry Christmas Station with Spiked drinks and snacks"
   },
   {
     "phaseNumber": 7,
