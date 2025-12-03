@@ -1037,7 +1037,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks - Cynthia Kelly"
+    "christmasStationDetails": "Coqitos - Cynthia Kelly"
   },
   {
     "phaseNumber": 7,
