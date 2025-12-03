@@ -395,6 +395,10 @@ function initMap() {
     console.log("Map image loaded:", mapImg.width, "x", mapImg.height);
     canvas.width  = mapImg.width;
     canvas.height = mapImg.height;
+	// make wrapper match the canvas so hit-testing stays aligned
+  mapWrapper.style.width = canvas.width + "px";
+  mapWrapper.style.height = canvas.height + "px";
+	
     drawLots();
   };
 

@@ -120,21 +120,24 @@ header.top-bar {
       gap: 8px;
     }
 
-    .map-wrapper {
-      position: relative;
-      margin: 0 auto;
-      max-width: 100%;
-      overflow: auto;
-      background: #e5e7eb;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-    }
+.map-wrapper{
+  position: relative;
+  margin: 0 auto;
+  width: fit-content;      /* shrink-wrap to canvas/image */
+  max-width: 100%;
+  overflow: auto;
+  background: #e5e7eb;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
 
-    #mapCanvas {
-      display: block;
-      max-width: 100%;
-      height: auto;
-    }
+/* IMPORTANT: don't let canvas auto-scale with height:auto */
+#mapCanvas{
+  display:block;
+  width: 100%;             /* allow downscaling to fit screen */
+  height: auto;
+}
+
 
     /* Download bar */
     #download-bar { margin: 10px 0; text-align: center; }
@@ -147,36 +150,48 @@ header.top-bar {
     }
 
     /* Popup card */
-    #lotPopup {
-      position: absolute;
-      max-width: 260px;
-      background: #ffffff;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-      padding: 8px 10px;
-      font-size: 0.8rem;
-      z-index: 500;
+#lotPopup {
+  position: absolute;
+  max-width: 260px;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  z-index: 500;
 
-      max-height: 60vh;
-      overflow-y: auto;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      white-space: normal;
+  max-height: 60vh;
+  overflow-y: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 
-      margin: 10px;
-      box-sizing: border-box;
-    }
+  /* IMPORTANT: don't use margin on absolutely positioned popup */
+  margin: 0;
 
-    @media (max-width: 800px) {
-      #lotPopup {
-        left: 50% !important;
-        top: 20% !important;
-        transform: translateX(-50%);
-        max-width: 90vw;
-        max-height: 70vh;
-      }
-    }
+  /* IMPORTANT: ensure desktop popup isn't shifted */
+  transform: none;
+
+  box-sizing: border-box;
+}
+
+#lotPopup.hidden {
+  display: none !important;
+}
+
+/* Mobile: center it like a modal */
+@media (max-width: 520px) {
+  #lotPopup {
+    left: 50% !important;
+    top: 12px !important;
+    transform: translateX(-50%) !important;
+    width: min(92vw, 380px);
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+  }
+}
+
 
     #lotPopup.hidden { display: none; }
 
