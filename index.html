@@ -58,20 +58,38 @@ header.top-bar {
   transform: translateX(-50%);
   text-align: center;
 
-  font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0.4px;
 
   padding: 4px 12px;
   border-radius: 999px;
 
-  background: #065f46;      /* green */
-  border: 1px solid #34d399; /* mint border */
+  background: #065f46;        /* green */
+  border: 1px solid #34d399;  /* mint border */
   color: #ecfdf5;
 
-  pointer-events: none; /* so it won't block clicks */
+  pointer-events: none;
+  z-index: 5;
+
+  /* Desktop/tablet default: single line */
   white-space: nowrap;
+  font-size: 0.85rem;
+  line-height: 1.1;
 }
+
+/* Phones: allow two lines (and keep it from getting too wide) */
+@media (max-width: 520px) {
+  .status-text {
+    white-space: normal;      /* allow wrap */
+    max-width: 60vw;          /* prevents pill from spanning entire header */
+    line-height: 1.05;
+    font-size: 0.75rem;       /* slightly smaller so it fits nicer */
+    padding: 4px 10px;
+  }
+}
+
+  /* NEW
+
 
 
 
