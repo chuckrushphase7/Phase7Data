@@ -1632,7 +1632,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks  -  Katie Schindler"
+    "christmasStationDetails": "Grinch shots and snacks  -  Katie Schindler"
   },
   {
     "phaseNumber": 7,
