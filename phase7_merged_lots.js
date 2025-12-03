@@ -17,7 +17,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Pudding shots - Nancy Campbell"
+    "christmasStationDetails": "Pudding shots & Snacks - Nancy Campbell"
   },
   {
     "phaseNumber": 7,
@@ -459,7 +459,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks  -"
+    "christmasStationDetails": "Goodies"
   },
   {
     "phaseNumber": 7,
@@ -559,9 +559,9 @@ const phaseResidentsData = [
     "y": 802,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Shots & Chocolate Chip Cookies"
   },
   {
     "phaseNumber": 7,
@@ -731,7 +731,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Shots and light snacks  -  Claudia Brozda"
+    "christmasStationDetails": "Shots / Teriyaki meatball sliders  - Nick &  Claudia Brozda"
   },
   {
     "phaseNumber": 7,
@@ -763,9 +763,9 @@ const phaseResidentsData = [
     "y": 815,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Shots & Cookies"
   },
   {
     "phaseNumber": 7,
@@ -1358,7 +1358,7 @@ const phaseResidentsData = [
     "y": 546,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
     "christmasStationDetails": null
   },
@@ -1596,9 +1596,9 @@ const phaseResidentsData = [
     "y": 678,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Merry Christmas Station with Spiked drinks & Snacks"
   },
   {
     "phaseNumber": 7,
@@ -1768,20 +1768,20 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Mulled wine and Italian Christmas cookies  -  Lee-Ann DiAnni"
+    "christmasStationDetails": "Hot apple Pie Drink & home made Italian Round Cookies & Biscotti  -  Lee-Ann DiAnni"
   },
   {
     "phaseNumber": 7,
     "lotNumber": 1801,
     "homeTypeStyle": "Beach, Cabana Bay",
     "contractStatus": "UC",
-    "primaryName": "Todd Brewer",
-    "secondaryName": "Linda Brewer",
-    "originCityState": "New Hill, NC",
+    "primaryName": "Ty Toth",
+    "secondaryName": "Holly Toth",
+    "originCityState": "Annolopolos, MD",
     "address": "183 Good Life Way",
     "x": 842,
     "y": 470,
-    "phone": null,
+    "phone": "+1 410 9037159 +1 410 903 7160",
     "notes": null,
     "isChristmasStation": false,
     "isSensitive": false,
@@ -3755,9 +3755,9 @@ const phaseResidentsData = [
     "y": 637,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Vodka & Rum Shots, Vodka & Cranberry Drink & Snacks"
   },
   {
     "phaseNumber": 7,
@@ -4418,9 +4418,9 @@ const phaseResidentsData = [
     "y": 711,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Buddy the Elf Themed Drinks, snacks, and goodies with 21 Seaplane"
   },
   {
     "phaseNumber": 7,
