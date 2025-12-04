@@ -27,87 +27,92 @@
       min-height: 100vh;
 
       padding-top: constant(safe-area-inset-top);
-      padding-top: env(safe-area-inset-top);  /* NEW: keep page from sliding sideways */
-  overflow-x: hidden;
-	  
+      padding-top: env(safe-area-inset-top);
+
+      /* keep the PAGE from ever horizontally scrolling */
+      overflow-x: hidden;
     }
 
-header.top-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 2000;
+    /* ---------- HEADER ---------- */
+    header.top-bar {
+      position: sticky;   /* sticky stays aligned with page during horizontal pans */
+      top: 0;
+      z-index: 2000;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 10px;
-  background: #111827;
-  color: #f9fafb;
-  margin-top: 0; /* usually better to remove this with fixed */
-}
+      /* important: establish containing block for absolute center pill */
+      position: sticky;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
+      padding: 6px 10px;
+      background: #111827;
+      color: #f9fafb;
 
+      /* keep it full width */
+      left: 0;
+      right: 0;
+    }
 
-
-    .app-title { font-weight: 600; font-size: 1rem; }
+    .app-title {
+      font-weight: 700;
+      font-size: 1rem;
+      white-space: nowrap;
+    }
 
     .top-bar-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       font-size: 0.85rem;
+      white-space: nowrap;
     }
 
-.status-text {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
+    /* Center pill */
+    .status-text {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
 
-  font-weight: 800;
-  letter-spacing: 0.4px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
 
-  padding: 4px 12px;
-  border-radius: 999px;
+      padding: 4px 12px;
+      border-radius: 999px;
 
-  background: #065f46;        /* green */
-  border: 1px solid #34d399;  /* mint border */
-  color: #ecfdf5;
+      background: #065f46;        /* green */
+      border: 1px solid #34d399;  /* mint border */
+      color: #ecfdf5;
 
-  pointer-events: none;
-  z-index: 5;
+      pointer-events: none;
+      z-index: 5;
 
-  /* Desktop/tablet default: single line */
-  white-space: nowrap;
-  font-size: 0.85rem;
-  line-height: 1.1;
-}
+      white-space: nowrap;
+      font-size: 0.85rem;
+      line-height: 1.1;
+    }
 
-/* Phones: allow two lines (and keep it from getting too wide) */
-@media (max-width: 520px) {
-  .status-text {
-    white-space: normal;      /* allow wrap */
-    max-width: 60vw;          /* prevents pill from spanning entire header */
-    line-height: 1.05;
-    font-size: 0.75rem;       /* slightly smaller so it fits nicer */
-    padding: 4px 10px;
-  }
-}
-
-  /* NEW
-
-
-
+    @media (max-width: 520px) {
+      .status-text {
+        white-space: normal;
+        max-width: 60vw;
+        line-height: 1.05;
+        font-size: 0.75rem;
+        padding: 4px 10px;
+      }
+    }
 
     label.season-toggle {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       cursor: pointer;
+      user-select: none;
     }
+
     label.season-toggle span { white-space: nowrap; }
+
     input[type="checkbox"] { transform: scale(1.1); }
 
     .link-button {
@@ -120,90 +125,87 @@ header.top-bar {
       padding: 2px 4px;
     }
 
+    /* ---------- MAIN LAYOUT ---------- */
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
       padding: 8px;
       gap: 8px;
+
+      /* helps anchors / scrollIntoView not end up under the sticky header */
+      scroll-margin-top: 60px;
     }
 
-.map-wrapper{
-  position: relative;
-  margin: 0 auto;
-  width: fit-content;      /* shrink-wrap to canvas/image */
-  max-width: 100%;
-  overflow: auto;
-  background: #e5e7eb;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-}
+    /* ---------- MAP WRAPPER ---------- */
+    .map-wrapper{
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      overflow: auto;                 /* allow pan inside wrapper */
+      -webkit-overflow-scrolling: touch;
 
-/* IMPORTANT: don't let canvas auto-scale with height:auto */
-#mapCanvas{
-  display:block;
-  width: 100%;             /* allow downscaling to fit screen */
-  height: auto;
-}
+      background: #e5e7eb;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      margin: 0 auto;
+    }
 
+    /* Canvas should render at its intrinsic pixel size; wrapper provides scrolling */
+    #mapCanvas{
+      display: block;
+      width: auto;                    /* IMPORTANT */
+      height: auto;
+      max-width: none;                /* IMPORTANT */
+    }
 
-    /* Download bar */
+    /* ---------- DOWNLOAD BAR ---------- */
     #download-bar { margin: 10px 0; text-align: center; }
 
-    /* Release label (under download buttons) */
     #apkMeta {
       margin-top: 6px;
-      font-size: 0.75rem; /* slightly smaller, still readable */
+      font-size: 0.75rem;
       color: #374151;
     }
 
-    /* Popup card */
-#lotPopup {
-  position: absolute;
-  max-width: 260px;
-  background: #ffffff;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  padding: 8px 10px;
-  font-size: 0.8rem;
-  z-index: 500;
+    /* ---------- POPUP ---------- */
+    #lotPopup {
+      position: absolute;
+      max-width: 260px;
+      background: #ffffff;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      z-index: 500;
 
-  max-height: 60vh;
-  overflow-y: auto;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
+      max-height: 60vh;
+      overflow-y: auto;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
 
-  margin: 0;
-  transform: none;
-  box-sizing: border-box;
-}
+      margin: 0;
+      transform: none;
+      box-sizing: border-box;
+    }
 
-#lotPopup.hidden {
-  display: none !important;
-}
+    #lotPopup.hidden { display: none !important; }
 
-/* Mobile: center it like a modal */
-@media (max-width: 520px) {
-  #lotPopup {
-    left: 50% !important;
-    top: 12px !important;
-    transform: translateX(-50%) !important;
-    width: min(92vw, 380px);
-    max-height: calc(100vh - 24px);
-    overflow-y: auto;
-  }
-}
-
-
-
-    #lotPopup.hidden { display: none; }
+    @media (max-width: 520px) {
+      #lotPopup {
+        left: 50% !important;
+        top: 12px !important;
+        transform: translateX(-50%) !important;
+        width: min(92vw, 380px);
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+      }
+    }
 
     #lotPopup h3 { margin: 0 0 4px 0; font-size: 0.9rem; }
-
     .popup-close { margin-top: 6px; font-size: 0.75rem; padding: 2px 6px; }
-
     .popup-inner p { margin: 2px 0; }
 
     @media (max-width: 600px) {
@@ -211,7 +213,7 @@ header.top-bar {
       #lotPopup h3 { font-size: 0.85rem; }
     }
 
-    /* Privacy panel / modal */
+    /* ---------- PRIVACY MODAL ---------- */
     .privacy-panel {
       position: fixed;
       inset: 0;
@@ -237,7 +239,7 @@ header.top-bar {
     .privacy-content ul { padding-left: 20px; }
     .privacy-content button { margin-top: 12px; padding: 4px 10px; font-size: 0.85rem; }
 
-    /* Sprite overlay for animated icons (gator, etc.) */
+    /* ---------- SPRITES ---------- */
     #spriteLayer {
       position: absolute;
       inset: 0;
@@ -265,7 +267,7 @@ header.top-bar {
       color: #6b7280;
     }
 
-    /* ANDROID APP LAYOUT TWEAKS */
+    /* ---------- ANDROID APP LAYOUT TWEAKS ---------- */
     .android-app #download-bar,
     .android-app #android-instructions,
     .android-app #ios-instructions { display: none !important; }
@@ -273,23 +275,19 @@ header.top-bar {
 </head>
 
 <body>
-<header class="top-bar">
-  <div class="app-title">
-    <div class="app-title-main">Phase 7</div>
+  <header class="top-bar">
+    <div class="app-title">Phase 7</div>
 
-  </div>
+    <span id="lockStatus" class="status-text">Latitude Margaritaville Hilton Head</span>
 
-  <span id="lockStatus" class="status-text">LMHH Phase 7</span>
-
-  <div class="top-bar-right">
-    <label class="season-toggle">
-      <input type="checkbox" id="seasonOnlyCheckbox" />
-      <span id="seasonOnlyLabel">Seasonal</span>
-    </label>
-    <button id="privacyButton" class="link-button">Privacy</button>
-  </div>
-</header>
-
+    <div class="top-bar-right">
+      <label class="season-toggle">
+        <input type="checkbox" id="seasonOnlyCheckbox" />
+        <span id="seasonOnlyLabel">Seasonal</span>
+      </label>
+      <button id="privacyButton" class="link-button">Privacy</button>
+    </div>
+  </header>
 
   <!-- Download buttons (hidden in Android app via .android-app class) -->
   <div id="download-bar">
@@ -333,12 +331,9 @@ header.top-bar {
     <div class="map-wrapper" id="mapWrapper">
       <canvas id="mapCanvas"></canvas>
       <div id="lotPopup" class="hidden"></div>
-
-      <!-- Overlay layer for animated sprites like the gator -->
       <div id="spriteLayer"></div>
     </div>
 
-    <!-- Android install instructions (hidden in Android app) -->
     <section id="android-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
       <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">Installing the Android App</h2>
 
@@ -361,7 +356,6 @@ header.top-bar {
       </p>
     </section>
 
-    <!-- iOS instructions (hidden in Android app) -->
     <section id="ios-instructions" style="margin: 20px auto; max-width: 600px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
       <h2 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">Using Phase 7 on iPhone / iPad</h2>
 
@@ -382,7 +376,6 @@ header.top-bar {
     </section>
   </main>
 
-  <!-- Admin / Debug Panel (visible with ?admin=1) -->
   <section id="admin-panel" style="display:none; margin: 20px auto; max-width: 800px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
     <h2 style="font-size: 1.05rem; margin-bottom: 8px; text-align: center;">Admin / Debug View</h2>
     <p style="font-size: 0.85rem; color: #555; text-align: center;">
@@ -404,7 +397,6 @@ header.top-bar {
     This map is for Phase 7 residents. Seasonal view hides personal information by default.
   </footer>
 
-  <!-- Privacy modal -->
   <div id="privacyPanel" class="privacy-panel hidden">
     <div class="privacy-content">
       <h2>Privacy &amp; Data Use</h2>
@@ -435,7 +427,6 @@ header.top-bar {
   <script src="draw_lots.js"></script>
   <script src="map_core.js"></script>
 
-  <!-- Populate APK build label -->
   <script>
     (function () {
       var el = document.getElementById("apkBuildLabel");
