@@ -27,7 +27,9 @@
       min-height: 100vh;
 
       padding-top: constant(safe-area-inset-top);
-      padding-top: env(safe-area-inset-top);
+      padding-top: env(safe-area-inset-top);  /* NEW: keep page from sliding sideways */
+  overflow-x: hidden;
+	  
     }
 
 header.top-bar {
@@ -39,6 +41,13 @@ header.top-bar {
   background: #111827;
   color: #f9fafb;
   margin-top: 4px;
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+
+  /* keep it pinned even if something causes horizontal scroll */
+  left: 0;
+  right: 0;
 }
 
 
@@ -167,12 +176,8 @@ header.top-bar {
   overflow-wrap: break-word;
   white-space: normal;
 
-  /* IMPORTANT: don't use margin on absolutely positioned popup */
   margin: 0;
-
-  /* IMPORTANT: ensure desktop popup isn't shifted */
   transform: none;
-
   box-sizing: border-box;
 }
 
@@ -191,6 +196,7 @@ header.top-bar {
     overflow-y: auto;
   }
 }
+
 
 
     #lotPopup.hidden { display: none; }
