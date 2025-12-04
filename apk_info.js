@@ -1,4 +1,4 @@
-const apkInfo = { 
-  buildDate: "Thu 12/04/2025 11:03:10.05", 
-  tag: "v1.0.0" 
-}; 
+﻿const apkInfo = {
+  buildDate: "2025-12-04 15:05:15",
+  tag: "v1.0.0"
+};

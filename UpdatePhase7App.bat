@@ -1,137 +1,108 @@
 @echo off
-echo Phase 7 App - FULL AUTO BUILD + PUBLISH
-echo ================================================
+setlocal enableextensions enabledelayedexpansion
 
-REM === PATHS YOU ACTUALLY CARE ABOUT ==========================
+echo Phase 7 App - BUILD APK (NO GIT PUSH)
+echo =====================================
+echo.
 
-REM Canonical repo (drives web + data)
+REM === PATHS ===
 set "PHASE7DATA=C:\GitRepos\Phase7Data"
-
-REM Android Studio project
 set "ANDROIDPROJ=C:\AndroidProjects\Phase7Residents"
-
-REM Mirror directories on D: drive
-set "MIRROR_PHASE7DATA=D:\Phase7Data"
-set "MIRROR_ANDROIDPROJ=D:\AndroidProjects\Phase7Residents"
-
-REM Git / GitHub settings
-set "GIT_BRANCH=main"
-set "GITHUB_OWNER=chuckrushphase7"
-set "GITHUB_REPO=Phase7Data"
-set "GITHUB_RELEASE_TAG=v1.0.0"
-
-echo.
-echo [0/8] Ensuring mirror folders exist ...
-if not exist "%MIRROR_PHASE7DATA%" (
-    echo Creating %MIRROR_PHASE7DATA%
-    mkdir "%MIRROR_PHASE7DATA%"
-)
-
-if not exist "%MIRROR_ANDROIDPROJ%" (
-    echo Creating %MIRROR_ANDROIDPROJ%
-    mkdir "%MIRROR_ANDROIDPROJ%"
-)
-
-echo.
-echo [1/8] Regenerating phase7_merged_lots.js from CSV ...
-pushd "%PHASE7DATA%"
-python "%PHASE7DATA%\generate_phase7_merged_lots.py"
-if errorlevel 1 (
-    echo *** ERROR: Failed to generate phase7_merged_lots.js
-    pause
-    popd
-    goto :EOF
-)
-popd
-
-echo.
-echo [2/8] Copying web assets to Android project ...
-
 set "ASSETS=%ANDROIDPROJ%\app\src\main\assets"
 
-copy /Y "%PHASE7DATA%\phase7_merged_lots.js" "%ASSETS%\phase7_merged_lots.js"
-copy /Y "%PHASE7DATA%\index.html"              "%ASSETS%\index.html"
-copy /Y "%PHASE7DATA%\Phase7Org.png"           "%ASSETS%\Phase7Org.png"
-copy /Y "%PHASE7DATA%\mapped_sites.js"         "%ASSETS%\mapped_sites.js"
-copy /Y "%PHASE7DATA%\events.js"               "%ASSETS%\events.js"
-copy /Y "%PHASE7DATA%\event_engine.js"         "%ASSETS%\event_engine.js"
-copy /Y "%PHASE7DATA%\map_core.js"             "%ASSETS%\map_core.js"
-copy /Y "%PHASE7DATA%\draw_lots.js"            "%ASSETS%\draw_lots.js"
-copy /Y "%PHASE7DATA%\draw_sites.js"           "%ASSETS%\draw_sites.js"
-copy /Y "%PHASE7DATA%\season_name.txt"         "%ASSETS%\season_name.txt"
-copy /Y "%PHASE7DATA%\phase7_password.txt"     "%ASSETS%\phase7_password.txt"
-
-REM Optional snow effect
-if exist "%PHASE7DATA%\snow.js" (
-    copy /Y "%PHASE7DATA%\snow.js" "%ASSETS%\snow.js"
-)
-
-echo.
-echo [3/8] Building Android debug APK ...
-pushd "%ANDROIDPROJ%"
-call gradlew.bat assembleDebug
-popd
-
-echo.
-echo [4/8] Copying APKs and updating apk_info.js ...
-
+REM APK locations
 set "APK_SOURCE=%ANDROIDPROJ%\app\build\outputs\apk\debug\app-debug.apk"
 set "APK_REPO=%PHASE7DATA%\Phase7Residents.apk"
 
-copy /Y "%APK_SOURCE%" "%APK_REPO%"
+REM Release tag (shown in apk_info.js)
+set "GITHUB_RELEASE_TAG=v1.0.0"
 
-if exist "%MIRROR_ANDROIDPROJ%" (
-    copy /Y "%APK_SOURCE%" "%MIRROR_ANDROIDPROJ%\Phase7Residents.apk"
+REM --- Sanity checks ---
+if not exist "%PHASE7DATA%\" (
+  echo ERROR: Repo folder not found: %PHASE7DATA%
+  pause
+  exit /b 1
+)
+if not exist "%ANDROIDPROJ%\" (
+  echo ERROR: Android project folder not found: %ANDROIDPROJ%
+  pause
+  exit /b 1
+)
+if not exist "%ASSETS%\" (
+  echo ERROR: Android assets folder not found: %ASSETS%
+  pause
+  exit /b 1
+)
+echo Paths OK.
+echo.
+
+echo [1/5] Regenerating phase7_merged_lots.js from CSV ...
+pushd "%PHASE7DATA%"
+python "%PHASE7DATA%\generate_phase7_merged_lots.py"
+if errorlevel 1 (
+  echo *** ERROR: Failed to generate phase7_merged_lots.js
+  popd
+  pause
+  exit /b 1
+)
+popd
+echo.
+
+echo [2/5] Copying web assets to Android project assets ...
+copy /Y "%PHASE7DATA%\phase7_merged_lots.js" "%ASSETS%\phase7_merged_lots.js" >nul
+copy /Y "%PHASE7DATA%\index.html"           "%ASSETS%\index.html"           >nul
+copy /Y "%PHASE7DATA%\Phase7Org.png"        "%ASSETS%\Phase7Org.png"        >nul
+copy /Y "%PHASE7DATA%\mapped_sites.js"      "%ASSETS%\mapped_sites.js"      >nul
+copy /Y "%PHASE7DATA%\events.js"            "%ASSETS%\events.js"            >nul
+copy /Y "%PHASE7DATA%\event_engine.js"      "%ASSETS%\event_engine.js"      >nul
+copy /Y "%PHASE7DATA%\map_core.js"          "%ASSETS%\map_core.js"          >nul
+copy /Y "%PHASE7DATA%\draw_lots.js"         "%ASSETS%\draw_lots.js"         >nul
+copy /Y "%PHASE7DATA%\draw_sites.js"        "%ASSETS%\draw_sites.js"        >nul
+copy /Y "%PHASE7DATA%\season_name.txt"      "%ASSETS%\season_name.txt"      >nul
+copy /Y "%PHASE7DATA%\phase7_password.txt"  "%ASSETS%\phase7_password.txt"  >nul
+
+if exist "%PHASE7DATA%\snow.js" (
+  copy /Y "%PHASE7DATA%\snow.js" "%ASSETS%\snow.js" >nul
 )
 
-REM Write apk_info.js (simple version)
-echo const apkInfo = { > "%PHASE7DATA%\apk_info.js"
-echo   buildDate: "%DATE% %TIME%", >> "%PHASE7DATA%\apk_info.js"
-echo   tag: "%GITHUB_RELEASE_TAG%" >> "%PHASE7DATA%\apk_info.js"
-echo }; >> "%PHASE7DATA%\apk_info.js"
-
+echo Assets copied.
 echo.
-echo [5/8] Mirroring Phase7Data and AndroidProjects to D: ...
-robocopy "%PHASE7DATA%" "%MIRROR_PHASE7DATA%" /MIR >nul
-robocopy "%ANDROIDPROJ%" "%MIRROR_ANDROIDPROJ%" /MIR >nul
-echo Mirrors updated.
 
-echo.
-echo [6/8] Auto-committing and pushing changes to GitHub ...
-
-rem pushd "%PHASE7DATA%"
-rem git add .
-rem git commit -m "Auto-build: %DATE% %TIME%"
-rem git push origin %GIT_BRANCH%
-rem popd
-
-rem echo.
-rem echo [7/8] Uploading APK to GitHub Release (tag %GITHUB_RELEASE_TAG%) ...
-
-rem if exist "%APK_REPO%" (
-rem    echo Uploading "%APK_REPO%" to release %GITHUB_RELEASE_TAG% ...
-rem    gh release upload "%GITHUB_RELEASE_TAG%" "%APK_REPO%" --clobber
-rem ) else (
-rem    echo *** WARNING: APK not found at "%APK_REPO%". Skipping upload.
+echo [3/5] Building Android debug APK ...
+pushd "%ANDROIDPROJ%"
+call gradlew.bat assembleDebug
+if errorlevel 1 (
+  echo *** ERROR: Gradle build failed.
+  popd
+  pause
+  exit /b 1
 )
+popd
 echo.
-echo [8/8] ALL DONE!
+
+echo [4/5] Copying APK to repo ...
+if not exist "%APK_SOURCE%" (
+  echo *** ERROR: APK not found at:
+  echo %APK_SOURCE%
+  pause
+  exit /b 1
+)
+copy /Y "%APK_SOURCE%" "%APK_REPO%" >nul
+
+echo APK copied to: %APK_REPO%
+echo.
+
+echo [5/5] Writing apk_info.js with current timestamp (robust) ...
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$tag='%GITHUB_RELEASE_TAG%'; $dt=(Get-Date).ToString('yyyy-MM-dd HH:mm:ss');" ^
+  "'const apkInfo = {' | Set-Content -Encoding UTF8 '%PHASE7DATA%\apk_info.js';" ^
+  "('  buildDate: \"{0}\",' -f $dt) | Add-Content -Encoding UTF8 '%PHASE7DATA%\apk_info.js';" ^
+  "('  tag: \"{0}\"' -f $tag) | Add-Content -Encoding UTF8 '%PHASE7DATA%\apk_info.js';" ^
+  "'};' | Add-Content -Encoding UTF8 '%PHASE7DATA%\apk_info.js'"
+
+echo Wrote: %PHASE7DATA%\apk_info.js
+echo.
+
+echo DONE: Build complete (NO git commit/push, NO release upload).
 pause
-
-
-Rem Old Statements
-rem pushd "%PHASE7DATA%"
-rem git add .
-rem git commit -m "Auto-build: %DATE% %TIME%"
-rem git push origin %GIT_BRANCH%
-rem popd
-
-rem echo.
-rem echo [7/8] Uploading APK to GitHub Release (tag %GITHUB_RELEASE_TAG%) ...
-
-rem if exist "%APK_REPO%" (
-rem    echo Uploading "%APK_REPO%" to release %GITHUB_RELEASE_TAG% ...
-rem    gh release upload "%GITHUB_RELEASE_TAG%" "%APK_REPO%" --clobber
-rem ) else (
-rem    echo *** WARNING: APK not found at "%APK_REPO%". Skipping upload.
-)
+endlocal
