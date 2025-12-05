@@ -7,17 +7,27 @@
 
 
   <!-- Detect Android WebView mode early to avoid flicker -->
+
 <script>
   (function () {
     const qs = window.location.search || "";
-    const isAndroidParam = qs.indexOf("android=1") !== -1;
-    const isAndroidUA = /Android/i.test(navigator.userAgent);
+    const isAndroidParam = qs.includes("android=1");
 
-    if (isAndroidParam || isAndroidUA) {
+    const ua = navigator.userAgent || "";
+    const isAndroid = /Android/i.test(ua);
+
+    const proto = (window.location && window.location.protocol) ? window.location.protocol : "";
+    const isFileLike = (proto === "file:" || proto === "content:");
+
+    if (isAndroidParam || (isAndroid && isFileLike)) {
       document.documentElement.classList.add("android-app");
     }
   })();
 </script>
+
+
+
+
 
 
   <style>
