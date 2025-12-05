@@ -47,12 +47,48 @@ const EVENTS = [
   {
     id: "alligator_pond4",
     type: "alligator",
-    label: "Alligator Sighting",
+    label: "Alligator Warning",
     siteId: "Pond4",
     phaseNumber: 7,
     isActive: true,
     requiresUnlock: false,
     seasons: [],                   // all seasons
     description: "Wildlife reminder: use caution around water."
-  }
+  },
+   // ALLIGATOR / WILDLIFE AT POND1
+  {
+    id: "alligator_pond1",
+    type: "alligator",
+    label: "Alligator Warning",
+    siteId: "Pond1",
+    phaseNumber: 7,
+    isActive: true,
+    requiresUnlock: false,
+    seasons: [],                   // all seasons
+    description: "Wildlife reminder: use caution around water."
+  },
+   // ALLIGATOR / WILDLIFE AT POND2
+  {
+    id: "alligator_pond2",
+    type: "alligator",
+    label: "Alligator Warning",
+    siteId: "Pond2",
+    phaseNumber: 7,
+    isActive: true,
+    requiresUnlock: false,
+    seasons: [],                   // all seasons
+    description: "Wildlife reminder: use caution around water."
+  },
+   // ALLIGATOR / WILDLIFE AT POND3
+  {
+    id: "alligator_pond3",
+    type: "alligator",
+    label: "Alligator Warning",
+    siteId: "Pond3",
+    phaseNumber: 7,
+    isActive: true,
+    requiresUnlock: false,
+    seasons: [],                   // all seasons
+    description: "Wildlife reminder: use caution around water."
+  },
 ];

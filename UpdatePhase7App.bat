@@ -96,7 +96,7 @@ echo.
 echo [5/5] Writing apk_info.js with current timestamp (robust) ...
 echo [5/5] Writing apk_info.js with current timestamp ...
 powershell -NoProfile -ExecutionPolicy Bypass -File "%PHASE7DATA%\write_apk_info.ps1" -Phase7Data "%PHASE7DATA%" -Tag "%GITHUB_RELEASE_TAG%"
-if errorlevel 1 (
+if errorlevel 1 ( 
   echo *** ERROR: Failed to write apk_info.js
   pause
   exit /b 1

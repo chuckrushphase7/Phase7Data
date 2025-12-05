@@ -526,13 +526,14 @@ upsertSpriteImg("santaBlueGuitar", "santa_sleigh.png", 770, 1158, santaW);
   drawLots();
 
   // gators (add as many as you want)
+  document.querySelectorAll("#spriteLayer .alligator-sprite").forEach(e => e.remove());
+
   upsertGator("alligatorSprite1", 1129, 794, 28);
   upsertGator("alligatorSprite2", 617, 424, 28);
   upsertGator("alligatorSprite3", 345, 605, 28);
     upsertGator("alligatorSprite4",855 , 613, 28);
 };
 
-855
   mapImg.onerror = function (e) {
     console.error("FAILED to load map image Phase7Org.png", e);
   };
