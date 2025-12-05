@@ -9,6 +9,40 @@ let isUnlocked = false;
 
 let canvas, ctx, mapImg, mapWrapper;
 
+
+
+let zoomScale = 1;
+
+function setZoom(scale){
+  zoomScale = Math.max(0.5, Math.min(2.5, scale));
+
+  const z = document.getElementById("mapZoom");
+  const c = document.getElementById("mapCanvas");   // use local lookup (safer)
+  if (!z || !c) return;
+  if (!c.width || !c.height) return;                // not initialized yet
+
+  // resize scroll content so panning works
+  z.style.width  = (c.width  * zoomScale) + "px";
+  z.style.height = (c.height * zoomScale) + "px";
+
+  // scale canvas visually
+  c.style.width  = (c.width  * zoomScale) + "px";
+  c.style.height = (c.height * zoomScale) + "px";
+
+  // scale sprite layer to match
+  const layer = document.getElementById("spriteLayer");
+  if (layer) {
+    layer.style.width  = (c.width  * zoomScale) + "px";
+    layer.style.height = (c.height * zoomScale) + "px";
+  }
+}
+
+
+const isPhone = window.innerWidth < 700;
+setZoom(isPhone ? 0.6 : 1);   // tweak 0.55–0.7 to taste
+
+
+
 // LOTS from phase7_merged_lots.js
 const LOTS = (typeof phaseResidentsData !== "undefined") ? phaseResidentsData : [];
 
@@ -25,10 +59,14 @@ function upsertGator(id, x, y, size = 28) {
     layer.appendChild(el);
   }
 
-  el.style.left = x + "px";
-  el.style.top  = y + "px";
-  el.style.fontSize = size + "px";
+  // scale positions + size to match zoomed display
+  el.style.left = (x * zoomScale) + "px";
+  el.style.top  = (y * zoomScale) + "px";
+  el.style.fontSize = (size * zoomScale) + "px";
 }
+
+
+
 function upsertSpriteImg(id, src, x, y, widthPx = 90) {
   const layer = document.getElementById("spriteLayer");
   if (!layer) return;
@@ -320,15 +358,13 @@ function getCanvasXYFromClient(clientX, clientY) {
   const xInWrap = clientX - wrapRect.left;
   const yInWrap = clientY - wrapRect.top;
 
-  const xContent = xInWrap + mapWrapper.scrollLeft;
-  const yContent = yInWrap + mapWrapper.scrollTop;
+  // wrapper scroll is in the *unscaled content coordinates*, so undo zoom
+  const xContent = (xInWrap + mapWrapper.scrollLeft) / zoomScale;
+  const yContent = (yInWrap + mapWrapper.scrollTop)  / zoomScale;
 
-  // clamp to canvas bounds (prevents weird negatives / overscroll edges)
-  const x = Math.max(0, Math.min(canvas.width  - 1, xContent));
-  const y = Math.max(0, Math.min(canvas.height - 1, yContent));
-
-  return { x, y };
+  return { x: xContent, y: yContent };
 }
+
 
 
 
@@ -479,67 +515,66 @@ function upsertSpriteImg(id, src, x, y, widthPx = 95) {
 function initMap() {
   canvas = document.getElementById("mapCanvas");
   mapWrapper = document.getElementById("mapWrapper");
- 
-
-
-  if (!canvas || !mapWrapper) {
-    console.error("Canvas or mapWrapper not found in DOM.");
-    return;
-  }
-
   ctx = canvas.getContext("2d");
+
   mapImg = new Image();
-  mapImg.src = "Phase7Org.png";
 
- mapImg.onload = function () {
-  console.log("Map image loaded:", mapImg.width, "x", mapImg.height);
+  mapImg.onload = function () {
+    console.log("Map image loaded:", mapImg.width, "x", mapImg.height);
 
-  canvas.width  = mapImg.width;
-  canvas.height = mapImg.height;
-  const bg = MAPPED_SITES.find(s => s.siteId === "BlueGuitarPark" && s.phaseNumber === 7);
-if (bg?.polygon) {
-  const c = polygonCentroid(bg.polygon);
-const isPhone = window.innerWidth < 600;
-const santaW = isPhone ? 55 : 70;
-const yOff   = isPhone ? 20 : 25;
+    // Golden rule: canvas stays in original pixel space
+    canvas.width  = mapImg.width;
+    canvas.height = mapImg.height;
 
-upsertSpriteImg("santaBlueGuitar", "santa_sleigh.png", 770, 1158, santaW);
+    // Make sprite layer match original pixel space (we'll scale positions visually if needed)
+    const layer = document.getElementById("spriteLayer");
+    if (layer) {
+      layer.style.width  = canvas.width + "px";
+      layer.style.height = canvas.height + "px";
+    }
+
+    // Default zoom: fit-to-screen on phones, normal on PC
+const isPhone = window.innerWidth < 700;
 
 
+if (isPhone) {
+  const margin = 8;
 
+  const wrapW = mapWrapper.clientWidth || mapWrapper.getBoundingClientRect().width;
+  const wrapH = mapWrapper.clientHeight || mapWrapper.getBoundingClientRect().height;
 
+  const fitW = (wrapW - margin) / canvas.width;
+  const fitH = (wrapH - margin) / canvas.height;
 
+  const fit = Math.min(fitW, fitH);
+
+  setZoom(Math.max(0.15, Math.min(0.35, fit)));
 } else {
-  console.warn("BlueGuitarPark not found in MAPPED_SITES.");
+  setZoom(1);
 }
 
 
 
 
-  // keep sprite overlay in the same coordinate space as canvas
-  const layer = document.getElementById("spriteLayer");
-  if (layer) {
-    layer.style.width  = canvas.width + "px";
-    layer.style.height = canvas.height + "px";
-  }
+    drawLots();
 
-  drawLots();
+    // gators (clear then add exactly what we expect)
+    document.querySelectorAll("#spriteLayer .alligator-sprite").forEach(e => e.remove());
+    upsertGator("alligatorSprite1", 1129, 794, 28);
+    upsertGator("alligatorSprite2", 617, 424, 28);
+    upsertGator("alligatorSprite3", 345, 605, 28);
+    upsertGator("alligatorSprite4", 855, 613, 28);
 
-  // gators (add as many as you want)
-  document.querySelectorAll("#spriteLayer .alligator-sprite").forEach(e => e.remove());
-
-  upsertGator("alligatorSprite1", 1129, 794, 28);
-  upsertGator("alligatorSprite2", 617, 424, 28);
-  upsertGator("alligatorSprite3", 345, 605, 28);
-    upsertGator("alligatorSprite4",855 , 613, 28);
-};
+    setupCanvasEvents();
+  };
 
   mapImg.onerror = function (e) {
     console.error("FAILED to load map image Phase7Org.png", e);
   };
 
-  setupCanvasEvents();
+  mapImg.src = "Phase7Org.png";
 }
+
 
 // ------------------------
 // Startup

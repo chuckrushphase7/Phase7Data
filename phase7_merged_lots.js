@@ -2329,7 +2329,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks  -  Pamela Campbell"
+    "christmasStationDetails": "Sugar cookie shots and snack  mix  -  Pamela Campbell"
   },
   {
     "phaseNumber": 7,
