@@ -12,46 +12,107 @@ let canvas, ctx, mapImg, mapWrapper;
 // LOTS from phase7_merged_lots.js
 const LOTS = (typeof phaseResidentsData !== "undefined") ? phaseResidentsData : [];
 
+function upsertGator(id, x, y, size = 28) {
+  const layer = document.getElementById("spriteLayer");
+  if (!layer) return;
+
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement("div");
+    el.id = id;
+    el.className = "alligator-sprite";
+    el.textContent = "🐊";
+    layer.appendChild(el);
+  }
+
+  el.style.left = x + "px";
+  el.style.top  = y + "px";
+  el.style.fontSize = size + "px";
+}
+function upsertSpriteImg(id, src, x, y, widthPx = 90) {
+  const layer = document.getElementById("spriteLayer");
+  if (!layer) return;
+
+  let img = document.getElementById(id);
+  if (!img) {
+    img = document.createElement("img");
+    img.id = id;
+    img.className = "santa-sprite";
+    img.alt = id;
+    img.draggable = false;
+    layer.appendChild(img);
+  }
+
+  img.src = src;
+  img.style.left = x + "px";
+  img.style.top  = y + "px";
+  img.style.width = widthPx + "px";
+}
+
+function polygonCentroid(points) {
+  // points: [[x,y], [x,y], ...]
+  // Robust polygon centroid (area-weighted). Falls back to average if area is tiny.
+  let area2 = 0, cx = 0, cy = 0;
+  for (let i = 0; i < points.length; i++) {
+    const [x0, y0] = points[i];
+    const [x1, y1] = points[(i + 1) % points.length];
+    const cross = x0 * y1 - x1 * y0;
+    area2 += cross;
+    cx += (x0 + x1) * cross;
+    cy += (y0 + y1) * cross;
+  }
+
+  if (Math.abs(area2) < 1e-6) {
+    // Fallback: simple average
+    let sx = 0, sy = 0;
+    for (const [x, y] of points) { sx += x; sy += y; }
+    return { x: sx / points.length, y: sy / points.length };
+  }
+
+  const area = area2 / 2;
+  return { x: cx / (6 * area), y: cy / (6 * area) };
+}
+
+function upsertSpriteImg(id, src, x, y, widthPx = 90) {
+  const layer = document.getElementById("spriteLayer");
+  if (!layer) return;
+
+  let img = document.getElementById(id);
+  if (!img) {
+    img = document.createElement("img");
+    img.id = id;
+    img.className = "santa-sprite";
+    img.alt = id;
+    img.draggable = false;
+    layer.appendChild(img);
+  }
+
+  img.src = src;
+  img.style.left = x + "px";
+  img.style.top  = y + "px";
+  img.style.width = widthPx + "px";
+}
+
+
+
+function normalizeAlligator() {
+  const g = document.getElementById("alligatorSprite");
+  if (!g) return;
+
+  // Make it bright and centered over its coordinate
+  g.style.opacity = "1";
+  g.style.filter = "none";
+  g.style.transform = "translate(-50%, -50%)";
+  g.style.textShadow = "0 0 3px #fff, 0 0 6px #fff";
+}
+function removeSantaSprites() {
+  document.querySelectorAll(".santa-sprite").forEach(el => el.remove());
+}
+
 // ------------------------
 // Season + lock UI
 // ------------------------
-function debugNearestLot(x, y) {
-  if (!Array.isArray(LOTS) || LOTS.length === 0) {
-    console.warn("DEBUG: LOTS is empty or not loaded");
-    return;
-  }
 
-  let kept = 0, numeric = 0;
-  let best = null;
-  let bestD2 = Infinity;
-
-  for (const lot of LOTS) {
-    if (typeof shouldShowLot === "function" && !shouldShowLot(lot)) continue;
-    kept++;
-
-    const lx = Number(lot.x);
-    const ly = Number(lot.y);
-    if (!Number.isFinite(lx) || !Number.isFinite(ly)) continue;
-    numeric++;
-
-    const dx = x - lx, dy = y - ly;
-    const d2 = dx*dx + dy*dy;
-    if (d2 < bestD2) { bestD2 = d2; best = lot; }
-  }
-
-  console.log("DEBUG lots:", {
-    total: LOTS.length,
-    keptAfterFilter: kept,
-    numericCoords: numeric
-  });
-
-  if (!best) {
-    console.warn("DEBUG: No lot with numeric coords found.");
-    return;
-  }
-
-  
-}
 
 
 function getSeasonIcon(name) {
@@ -300,7 +361,9 @@ function getScrollOffsets() {
 
 function handleCanvasTap(clientX, clientY) {
   const pt = getCanvasXYFromClient(clientX, clientY);
-  debugNearestLot(pt.x, pt.y);
+
+// console.log("POND COORD:", pt.x.toFixed(1), pt.y.toFixed(1));
+// alert("tap " + pt.x.toFixed(1) + ", " + pt.y.toFixed(1));
 
 
 
@@ -371,6 +434,44 @@ function setupSeasonToggle() {
     drawLots();
   });
 }
+function polygonCentroid(points) {
+  let area2 = 0, cx = 0, cy = 0;
+  for (let i = 0; i < points.length; i++) {
+    const [x0, y0] = points[i];
+    const [x1, y1] = points[(i + 1) % points.length];
+    const cross = x0 * y1 - x1 * y0;
+    area2 += cross;
+    cx += (x0 + x1) * cross;
+    cy += (y0 + y1) * cross;
+  }
+  if (Math.abs(area2) < 1e-6) {
+    let sx = 0, sy = 0;
+    for (const [x, y] of points) { sx += x; sy += y; }
+    return { x: sx / points.length, y: sy / points.length };
+  }
+  const area = area2 / 2;
+  return { x: cx / (6 * area), y: cy / (6 * area) };
+}
+
+function upsertSpriteImg(id, src, x, y, widthPx = 95) {
+  const layer = document.getElementById("spriteLayer");
+  if (!layer) return;
+
+  let img = document.getElementById(id);
+  if (!img) {
+    img = document.createElement("img");
+    img.id = id;
+    img.className = "santa-sprite";
+    img.alt = id;
+    img.draggable = false;
+    layer.appendChild(img);
+  }
+
+  img.src = src;
+  img.style.left = x + "px";
+  img.style.top  = y + "px";
+  img.style.width = widthPx + "px";
+}
 
 // ------------------------
 // Map init
@@ -390,20 +491,48 @@ function initMap() {
   mapImg = new Image();
   mapImg.src = "Phase7Org.png";
 
-  mapImg.onload = function () {
-    console.log("Map image loaded:", mapImg.width, "x", mapImg.height);
+ mapImg.onload = function () {
+  console.log("Map image loaded:", mapImg.width, "x", mapImg.height);
 
-    // Golden rule: canvas stays in original pixel space
-    canvas.width  = mapImg.width;
-    canvas.height = mapImg.height;
+  canvas.width  = mapImg.width;
+  canvas.height = mapImg.height;
+  const bg = MAPPED_SITES.find(s => s.siteId === "BlueGuitarPark" && s.phaseNumber === 7);
+if (bg?.polygon) {
+  const c = polygonCentroid(bg.polygon);
+const isPhone = window.innerWidth < 600;
+const santaW = isPhone ? 55 : 70;
+const yOff   = isPhone ? 20 : 25;
 
-    // IMPORTANT: DO NOT force wrapper to canvas size.
-    // Let CSS make wrapper responsive; wrapper scroll is normal.
+upsertSpriteImg("santaBlueGuitar", "santa_sleigh.png", 770, 1158, santaW);
 
 
-    drawLots();
-  };
 
+
+
+} else {
+  console.warn("BlueGuitarPark not found in MAPPED_SITES.");
+}
+
+
+
+
+  // keep sprite overlay in the same coordinate space as canvas
+  const layer = document.getElementById("spriteLayer");
+  if (layer) {
+    layer.style.width  = canvas.width + "px";
+    layer.style.height = canvas.height + "px";
+  }
+
+  drawLots();
+
+  // gators (add as many as you want)
+  upsertGator("alligatorSprite1", 1129, 794, 28);
+  upsertGator("alligatorSprite2", 617, 424, 28);
+  upsertGator("alligatorSprite3", 345, 605, 28);
+    upsertGator("alligatorSprite4",855 , 613, 28);
+};
+
+855
   mapImg.onerror = function (e) {
     console.error("FAILED to load map image Phase7Org.png", e);
   };

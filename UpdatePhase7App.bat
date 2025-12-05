@@ -49,6 +49,7 @@ popd
 echo.
 
 echo [2/5] Copying web assets to Android project assets ...
+
 copy /Y "%PHASE7DATA%\phase7_merged_lots.js" "%ASSETS%\phase7_merged_lots.js" >nul
 copy /Y "%PHASE7DATA%\index.html"           "%ASSETS%\index.html"           >nul
 copy /Y "%PHASE7DATA%\Phase7Org.png"        "%ASSETS%\Phase7Org.png"        >nul
@@ -58,12 +59,12 @@ copy /Y "%PHASE7DATA%\event_engine.js"      "%ASSETS%\event_engine.js"      >nul
 copy /Y "%PHASE7DATA%\map_core.js"          "%ASSETS%\map_core.js"          >nul
 copy /Y "%PHASE7DATA%\draw_lots.js"         "%ASSETS%\draw_lots.js"         >nul
 copy /Y "%PHASE7DATA%\draw_sites.js"        "%ASSETS%\draw_sites.js"        >nul
+copy /Y "%PHASE7DATA%\apk_info.js"          "%ASSETS%\apk_info.js"          >nul
 copy /Y "%PHASE7DATA%\season_name.txt"      "%ASSETS%\season_name.txt"      >nul
 copy /Y "%PHASE7DATA%\phase7_password.txt"  "%ASSETS%\phase7_password.txt"  >nul
 
-if exist "%PHASE7DATA%\snow.js" (
-  copy /Y "%PHASE7DATA%\snow.js" "%ASSETS%\snow.js" >nul
-)
+if exist "%PHASE7DATA%\snow.js" copy /Y "%PHASE7DATA%\snow.js" "%ASSETS%\snow.js" >nul
+if exist "%PHASE7DATA%\santa_sleigh.png" copy /Y "%PHASE7DATA%\santa_sleigh.png" "%ASSETS%\santa_sleigh.png" >nul
 
 echo Assets copied.
 echo.
@@ -93,12 +94,15 @@ echo APK copied to: %APK_REPO%
 echo.
 
 echo [5/5] Writing apk_info.js with current timestamp (robust) ...
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$tag='%GITHUB_RELEASE_TAG%'; $dt=(Get-Date).ToString('yyyy-MM-dd HH:mm:ss');" ^
-  "'const apkInfo = {' | Set-Content -Encoding UTF8 '%PHASE7DATA%\apk_info.js';" ^
-  "('  buildDate: \"{0}\",' -f $dt) | Add-Content -Encoding UTF8 '%PHASE7DATA%\apk_info.js';" ^
-  "('  tag: \"{0}\"' -f $tag) | Add-Content -Encoding UTF8 '%PHASE7DATA%\apk_info.js';" ^
-  "'};' | Add-Content -Encoding UTF8 '%PHASE7DATA%\apk_info.js'"
+echo [5/5] Writing apk_info.js with current timestamp ...
+powershell -NoProfile -ExecutionPolicy Bypass -File "%PHASE7DATA%\write_apk_info.ps1" -Phase7Data "%PHASE7DATA%" -Tag "%GITHUB_RELEASE_TAG%"
+if errorlevel 1 (
+  echo *** ERROR: Failed to write apk_info.js
+  pause
+  exit /b 1
+)
+echo.
+
 
 echo Wrote: %PHASE7DATA%\apk_info.js
 echo.

@@ -140,19 +140,58 @@
 
 
   /* Canvas uses intrinsic size; wrapper scrolls */
-  #mapCanvas{
-    display:block;
-    width:auto;        /* KEY: don’t stretch/shrink */
-    height:auto;
-    max-width:none;
-  }
+/* Canvas uses intrinsic size; wrapper scrolls */
+#mapCanvas{
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: none;
+  position: relative;
+  z-index: 1;
+}
 
-  /* Sprite overlay must never steal taps */
-  #spriteLayer{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-  }
+/* Sprite overlay must never steal taps */
+#mapWrapper{ position: relative; z-index: 0; }
+
+
+#spriteLayer{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1500px;
+  height: 1500px;
+  pointer-events: none;
+  z-index: 9999;     /* force top */
+}
+@keyframes gatorWiggle {
+  0%, 100% { transform: translate(-50%, -50%) rotate(-6deg); }
+  50%      { transform: translate(-50%, -50%) rotate(6deg); }
+}
+
+
+.alligator-sprite{
+  position: absolute;
+  z-index: 6;
+  transform: translate(-50%, -50%);
+  opacity: 1 !important;
+  filter: none !important;
+  text-shadow: 0 0 3px #fff, 0 0 6px #fff;
+  animation: gatorWiggle 1.2s ease-in-out infinite;
+
+}
+.santa-sprite{
+  position: absolute;
+  width: 90px;              /* tweak */
+  height: auto;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.35));
+}
+
+
+
+
 
   /* ---------- DOWNLOAD BAR ---------- */
   #download-bar{
@@ -312,8 +351,7 @@
   </div>
 
   <main>
-  .map-shell { text-align: center; }
-.map-shell .map-wrapper { text-align: left; }
+
 <div class="map-shell">
   <div class="map-wrapper" id="mapWrapper">
     <canvas id="mapCanvas"></canvas>
