@@ -13,6 +13,17 @@ let canvas, ctx, mapImg, mapWrapper;
 
 let zoomScale = 1;
 
+function hidePopup() {
+  const p = document.getElementById("lotPopup");
+  if (!p) return;
+  p.classList.add("hidden");
+  p.innerHTML = "";
+  p.style.left = "";
+  p.style.top = "";
+}
+
+
+
 function setZoom(scale){
   zoomScale = Math.max(0.5, Math.min(2.5, scale));
 
@@ -46,7 +57,7 @@ setZoom(isPhone ? 0.6 : 1);   // tweak 0.55–0.7 to taste
 // LOTS from phase7_merged_lots.js
 const LOTS = (typeof phaseResidentsData !== "undefined") ? phaseResidentsData : [];
 
-function upsertGator(id, x, y, size = 28) {
+function upsertGator(id, x, y, size = 28, dx = 0, dy = 0) {
   const layer = document.getElementById("spriteLayer");
   if (!layer) return;
 
@@ -55,15 +66,17 @@ function upsertGator(id, x, y, size = 28) {
     el = document.createElement("div");
     el.id = id;
     el.className = "alligator-sprite";
-    el.textContent = "🐊";
+    el.innerHTML = `<span class="gator-emoji">🐊</span>`;
     layer.appendChild(el);
   }
 
-  // scale positions + size to match zoomed display
-  el.style.left = (x * zoomScale) + "px";
-  el.style.top  = (y * zoomScale) + "px";
+  el.style.left = ((x + dx) * zoomScale) + "px";
+  el.style.top  = ((y + dy) * zoomScale) + "px";
   el.style.fontSize = (size * zoomScale) + "px";
 }
+
+
+
 
 
 
@@ -527,11 +540,7 @@ function initMap() {
     canvas.height = mapImg.height;
 
     // Make sprite layer match original pixel space (we'll scale positions visually if needed)
-    const layer = document.getElementById("spriteLayer");
-    if (layer) {
-      layer.style.width  = canvas.width + "px";
-      layer.style.height = canvas.height + "px";
-    }
+    
 
     // Default zoom: fit-to-screen on phones, normal on PC
 const isPhone = window.innerWidth < 700;
@@ -556,17 +565,31 @@ if (isPhone) {
 
 
 
-    drawLots();
+drawLots();
 
-    // gators (clear then add exactly what we expect)
-    document.querySelectorAll("#spriteLayer .alligator-sprite").forEach(e => e.remove());
-    upsertGator("alligatorSprite1", 1129, 794, 28);
-    upsertGator("alligatorSprite2", 617, 424, 28);
-    upsertGator("alligatorSprite3", 345, 605, 28);
-    upsertGator("alligatorSprite4", 855, 613, 28);
+// Grab sprite layer ONCE
+const spriteLayerEl = document.getElementById("spriteLayer");
 
-    setupCanvasEvents();
-  };
+// TEMP: add a big visible TEST box (proves spriteLayer is working)
+if (spriteLayerEl) {
+
+  
+   // Clear gators then add exactly what we expect
+  spriteLayerEl.querySelectorAll(".alligator-sprite").forEach(e => e.remove());
+
+  // Your real gators
+upsertGator("alligatorSprite1", 1129, 794, 28,  2, 12);
+upsertGator("alligatorSprite2",  617, 424, 28,  0,  0);
+upsertGator("alligatorSprite3",  345, 605, 28, 16,  0);
+upsertGator("alligatorSprite4",  855, 613, 28,  -6, 0);
+
+}
+
+
+
+setupCanvasEvents();
+};
+
 
   mapImg.onerror = function (e) {
     console.error("FAILED to load map image Phase7Org.png", e);

@@ -7,6 +7,113 @@
 //   - currentSeasonName, isSeasonOnly (from map_core.js)
 //   - canvas        (from map_core.js initMap)
 
+
+function showSceneBannerFromEvent(ev) {
+  const banner = document.getElementById("sceneBanner");
+  const img = document.getElementById("sceneImg");
+  const text = document.getElementById("sceneText");
+  const snow = document.getElementById("sceneSnow");
+  if (!banner || !img || !text || !snow) return;
+
+  banner.classList.remove("hidden");
+  banner.setAttribute("aria-hidden", "false");
+
+  const title = ev.label || "Blue Guitar Park";
+  const body = ev.desc || ev.description || ev.body || ev.text || "🎄 Merry Christmas from Blue Guitar Park!";
+
+  text.innerHTML = `
+    <div class="scene-title">${title}</div>
+    <div class="scene-body">${body}</div>
+  `;
+
+  // Set the image source (match your real filename!)
+  img.alt = title;
+  img.src = "santa_sleigh.png";
+  const burstSnow = () => {
+  let n = 0;
+  const t = setInterval(() => {
+    n++;
+
+    const media = document.querySelector("#sceneBanner .scene-media");
+    if (media) {
+      const r = media.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        snow.style.width = r.width + "px";
+        snow.style.height = r.height + "px";
+      }
+    }
+
+    if (typeof stopSceneSnow === "function") stopSceneSnow();
+    if (typeof startSceneSnow === "function") startSceneSnow(snow);
+
+    if (n >= 10) clearInterval(t);
+  }, 150);
+};
+
+img.onload = () => setTimeout(() => startSceneSnow(snow), 150);
+if (img.complete && img.naturalWidth > 0) setTimeout(() => startSceneSnow(snow), 150);
+
+
+
+  // IMPORTANT: start snow only after image + layout are ready (WebView-safe)
+const startSnowSafely = () => {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    forceSceneSnowCanvasSize();
+    if (typeof startSceneSnow === "function") startSceneSnow(snow);
+  }));
+};
+
+
+  const maybeDecode = () => {
+    // decode() is supported on many browsers; if not, fall back
+    if (img.decode) {
+      img.decode().then(startSnowSafely).catch(startSnowSafely);
+    } else {
+      startSnowSafely();
+    }
+  };
+
+  // If image is already cached, onload may not fire in the way you expect
+  if (img.complete && img.naturalWidth > 0) {
+    maybeDecode();
+  } else {
+    img.onload = maybeDecode;
+    img.onerror = () => { /* image failed, but don’t crash */ };
+  }
+
+  banner.scrollIntoView({ block: "start", behavior: "smooth" });
+    // WebView sometimes needs a second kick after layout settles
+  setTimeout(() => startSnowSafely(), 250);
+
+}
+function forceSceneSnowCanvasSize() {
+  const snow = document.getElementById("sceneSnow");
+  const media = document.querySelector("#sceneBanner .scene-media");
+  if (!snow || !media) return;
+
+  // Force CSS size to match the media box (WebView sometimes needs this)
+  const r = media.getBoundingClientRect();
+  if (r.width > 0 && r.height > 0) {
+    snow.style.width = r.width + "px";
+    snow.style.height = r.height + "px";
+  }
+}
+
+
+function hideSceneBanner() {
+  const banner = document.getElementById("sceneBanner");
+  if (!banner) return;
+  banner.classList.add("hidden");
+  banner.setAttribute("aria-hidden", "true");
+  if (typeof stopSceneSnow === "function") stopSceneSnow();
+}
+
+document.addEventListener("click", (e) => {
+  if (e.target && e.target.id === "sceneCloseBtn") hideSceneBanner();
+});
+
+
+
 function getEventIcon(ev) {
   switch (ev.type) {
     case "santa":        return "🎅";
@@ -169,7 +276,7 @@ function drawEvents(ctx) {
   });
 
   // Place / remove animated gator sprite
-  updateAlligatorSprite(alligatorPos);
+  // updateAlligatorSprite(alligatorPos);
 }
 
 function shouldShowSnowOverlay() {
@@ -235,6 +342,18 @@ function findEventAt(x, y) {
 
 function buildEventPopupContent(ev) {
   const lines = [];
+// Special case: Blue Guitar Park -> show the sleigh banner instead of popup content
+if (ev && (ev.siteId === "BlueGuitarPark" || ev.id === "blue_guitar_scene")) {
+  showSceneBannerFromEvent(ev);
+  
+
+  // IMPORTANT: prevent/close the normal popup if the caller tries to open it
+  if (typeof hidePopup === "function") hidePopup();
+
+  return ""; // content unused
+}
+
+
 
   lines.push(`<h3>${ev.label || "Event"}</h3>`);
 
