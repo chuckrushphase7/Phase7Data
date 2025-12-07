@@ -342,48 +342,38 @@ function findEventAt(x, y) {
 
 function buildEventPopupContent(ev) {
   const lines = [];
-// Special case: Blue Guitar Park -> show the sleigh banner instead of popup content
-if (ev && (ev.siteId === "BlueGuitarPark" || ev.id === "blue_guitar_scene")) {
-  showSceneBannerFromEvent(ev);
-  
 
-  // IMPORTANT: prevent/close the normal popup if the caller tries to open it
-  if (typeof hidePopup === "function") hidePopup();
-
-  return ""; // content unused
-}
-
-
+  // Special case: Blue Guitar Park -> show banner, no popup
+  if (ev && (ev.siteId === "BlueGuitarPark" || ev.id === "blue_guitar_scene")) {
+    if (typeof hidePopup === "function") hidePopup();
+    showSceneBannerFromEvent(ev);
+    return null; // tells caller to not open #lotPopup
+  }
 
   lines.push(`<h3>${ev.label || "Event"}</h3>`);
 
   if (ev.type) {
     const icon = getEventIcon(ev);
     const prettyType = ev.type.charAt(0).toUpperCase() + ev.type.slice(1);
-    lines.push(
-      `<p>${icon} <strong>Type:</strong> ${prettyType}</p>`
-    );
+    lines.push(`<p>${icon} <strong>Type:</strong> ${prettyType}</p>`);
   }
 
-  if (ev.description) {
-    lines.push(`<p>${ev.description}</p>`);
-  }
+  if (ev.description) lines.push(`<p>${ev.description}</p>`);
 
-  if (ev.lotNumber) {
-    lines.push(`<p>Near Lot ${ev.lotNumber}</p>`);
-  } else if (ev.siteId) {
-    lines.push(`<p>Location: ${ev.siteId}</p>`);
-  }
+  if (ev.lotNumber) lines.push(`<p>Near Lot ${ev.lotNumber}</p>`);
+  else if (ev.siteId) lines.push(`<p>Location: ${ev.siteId}</p>`);
 
   if (ev.seasons && ev.seasons.length > 0) {
-    lines.push(
-      `<p><strong>Season:</strong> ${ev.seasons.join(", ")}</p>`
-    );
+    lines.push(`<p><strong>Season:</strong> ${ev.seasons.join(", ")}</p>`);
   }
 
-  lines.push(
-    `<button class="popup-close" type="button" onclick="hidePopup()">Close</button>`
-  );
+  lines.push(`<button class="popup-close" type="button" onclick="hidePopup()">Close</button>`);
 
   return `<div class="popup-inner">${lines.join("")}</div>`;
 }
+
+
+
+
+
+  

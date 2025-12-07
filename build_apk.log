@@ -1,0 +1,95 @@
+============================================================
+Logging started: Sat 12/06/2025 23:12:14.20
+============================================================
+Repo   : C:\GitRepos\Phase7Data
+Project: C:\AndroidProjects\Phase7Residents
+Assets : C:\AndroidProjects\Phase7Residents\app\src\main\assets
+Tag    : v1.0.0
+============================================================
+[*] Sanity checks 
+[*] Backup index.html 
+        1 file(s) copied.
+[*] Generate merged lots 
+Wrote phase7_merged_lots.js from Phase7Residents_with_coords.csv (453 rows)
+[*] Write apk_info.js 
+Wrote: C:\GitRepos\Phase7Data\apk_info.js
+[*] Copy assets 
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+[*] Gradle assembleDebug 
+Configuration on demand is an incubating feature.
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac NO-SOURCE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:compressDebugAssets
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebug
+
+BUILD SUCCESSFUL in 6s
+34 actionable tasks: 3 executed, 31 up-to-date
+
+--- APK outputs (debug) ---
+ Volume in drive C has no label.
+ Volume Serial Number is 045D-0366
+
+ Directory of C:\AndroidProjects\Phase7Residents\app\build\outputs\apk\debug
+
+12/06/2025  23:12       247,655,148 app-debug.apk
+               1 File(s)    247,655,148 bytes
+               0 Dir(s)  59,087,618,048 bytes free
+--- APK outputs (all) ---
+C:\AndroidProjects\Phase7Residents\app\build\outputs\apk\androidTest\debug\app-debug-androidTest.apk
+C:\AndroidProjects\Phase7Residents\app\build\outputs\apk\debug\app-debug.apk
+[*] Copy APK to repo 
+Using APK: "C:\AndroidProjects\Phase7Residents\app\build\outputs\apk\debug\app-debug.apk"
+        1 file(s) copied.

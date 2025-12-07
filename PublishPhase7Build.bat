@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal EnableExtensions EnableDelayedExpansion
 
 set "PHASE7DATA=C:\GitRepos\Phase7Data"
 set "GIT_BRANCH=main"
@@ -16,7 +16,7 @@ echo.
 echo SAFETY CHECK:
 echo This will PUSH CODE to GitHub and OVERWRITE the Release APK.
 echo.
-set /p CONFIRM=Type PUBLISH to continue (or anything else to cancel): 
+set /p CONFIRM=Type PUBLISH to continue (or anything else to cancel):
 
 if /I "%CONFIRM%" NEQ "PUBLISH" goto :CANCEL
 
@@ -31,24 +31,30 @@ if errorlevel 1 goto :ERR_NO_GIT
 
 pushd "%PHASE7DATA%"
 
-echo --- Git status (before) ---
+echo(
+echo [Git status (before)]
 git status
-echo.
+echo(
 
-echo --- Stage changes (EXCLUDING any *.apk) ---
+echo(
+echo [Stage changes (EXCLUDING any *.apk)]
 git add -A
 git reset -- "*.apk" >nul 2>&1
+echo(
 
-echo --- Commit (ok if nothing to commit) ---
+echo(
+echo [Commit (ok if nothing to commit)]
 git commit -m "Publish build: %DATE% %TIME%"
-echo.
+echo(
 
-echo --- Push ---
+echo(
+echo [Push]
 git push origin %GIT_BRANCH%
 if errorlevel 1 goto :ERR_PUSH
-echo.
+echo(
 
-echo --- Upload APK to GitHub Release (clobber) ---
+echo(
+echo [Upload APK to GitHub Release (clobber)]
 gh release upload "%GITHUB_RELEASE_TAG%" "%APK_REPO%" --clobber
 if errorlevel 1 goto :ERR_UPLOAD
 
@@ -57,7 +63,6 @@ echo.
 echo DONE: Pushed repo updates and updated release APK.
 pause
 exit /b 0
-
 
 :CANCEL
 echo Cancelled.

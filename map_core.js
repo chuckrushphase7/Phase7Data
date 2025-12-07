@@ -307,26 +307,48 @@ function buildPopupContent(lot) {
 
 function hidePopup() {
   const popup = document.getElementById("lotPopup");
-  if (popup) popup.classList.add("hidden");
+  if (!popup) return;
+  popup.classList.add("hidden");
+  popup.innerHTML = "";
 }
 window.hidePopup = hidePopup;
+
 
 // Bottom-sheet popup: no left/top positioning (index.html uses position:fixed)
 function showLotPopup(lot) {
   const popup = document.getElementById("lotPopup");
   if (!popup) return;
-  popup.innerHTML = buildPopupContent(lot);
+
+  const html = buildPopupContent(lot);
+  if (!html) { hidePopup(); return; }   // <- add this
+
+  popup.innerHTML = html;
   popup.classList.remove("hidden");
 }
+
 
 
 
 function showEventPopup(ev) {
-  const popup = document.getElementById("lotPopup");
-  if (!popup) return;
-  popup.innerHTML = buildEventPopupContent(ev);
-  popup.classList.remove("hidden");
+  const p = document.getElementById("lotPopup");
+  if (!p) return;
+
+  const html = buildEventPopupContent(ev);
+
+  // If event returns null/"" (ex: Blue Guitar Park shows scene banner),
+  // do NOT open the popup.
+  if (!html) {
+    hidePopup();
+    return;
+  }
+
+  p.innerHTML = html;
+  p.classList.remove("hidden");
+
+  // no p.style.left/top here — popup is CSS-driven fixed bottom sheet now
 }
+window.showEventPopup = showEventPopup;
+
 
 
 

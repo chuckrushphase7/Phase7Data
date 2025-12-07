@@ -1,0 +1,44 @@
+============================================================
+Logging started: Sun 12/07/2025  0:24:55.96
+Script: C:\GitRepos\Phase7Data\UpdatePhase7App.bat
+============================================================
+"Phase 7 App - UPDATE starting..."
+"[*] Sanity checks"
+"Paths OK: Repo=C:\GitRepos\Phase7Data Project=C:\AndroidProjects\Phase7Residents Assets=C:\AndroidProjects\Phase7Residents\app\src\main\assets Tag=v1.0.0"
+"[*] Resolving Python..."
+"Python candidate: C:\Users\chuck_6\AppData\Local\Programs\Python\Python312\python.exe"
+[RUN] Python smoke test
+[CMD] "Python smoke test" "C:\Users\chuck_6\AppData\Local\Programs\Python\Python312\python.exe" -c "import sys; print(sys.executable)"
+'"Python smoke test"' is not recognized as an internal or external command,
+operable program or batch file.
+[FAIL] Python smoke test (RC=9009
+"[*] Backup index.html"
+"Backed up index.html to _backups\index_2025-12-07_00-24-57.html"
+[RUN] [1/5] generate_phase7_merged_lots.py
+[CMD] "[1/5] generate_phase7_merged_lots.py" "C:\Users\chuck_6\AppData\Local\Programs\Python\Python312\python.exe" "C:\GitRepos\Phase7Data\generate_phase7_merged_lots.py"
+The system cannot find the path specified.
+[FAIL] [1/5] generate_phase7_merged_lots.py (RC=3
+[RUN] [2/5] write_apk_info.ps1
+[CMD] "[2/5] write_apk_info.ps1" powershell -NoProfile -ExecutionPolicy Bypass -File "C:\GitRepos\Phase7Data\write_apk_info.ps1" -Phase7Data "C:\GitRepos\Phase7Data" -Tag "v1.0.0"
+The system cannot find the path specified.
+[FAIL] [2/5] write_apk_info.ps1 (RC=3
+"[COPY] C:\GitRepos\Phase7Data\phase7_merged_lots.js -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\phase7_merged_lots.js"
+"[COPY] C:\GitRepos\Phase7Data\index.html -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\index.html"
+"[COPY] C:\GitRepos\Phase7Data\Phase7Org.png -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\Phase7Org.png"
+"[COPY] C:\GitRepos\Phase7Data\mapped_sites.js -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\mapped_sites.js"
+"[COPY] C:\GitRepos\Phase7Data\events.js -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\events.js"
+"[COPY] C:\GitRepos\Phase7Data\event_engine.js -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\event_engine.js"
+"[COPY] C:\GitRepos\Phase7Data\map_core.js -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\map_core.js"
+"[COPY] C:\GitRepos\Phase7Data\draw_lots.js -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\draw_lots.js"
+"[COPY] C:\GitRepos\Phase7Data\draw_sites.js -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\draw_sites.js"
+"[COPY] C:\GitRepos\Phase7Data\apk_info.js -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\apk_info.js"
+"[COPY] C:\GitRepos\Phase7Data\season_name.txt -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\season_name.txt"
+"[COPY] C:\GitRepos\Phase7Data\phase7_password.txt -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\phase7_password.txt"
+"[COPY] C:\GitRepos\Phase7Data\snow_scene.js -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\snow_scene.js"
+"[COPY] C:\GitRepos\Phase7Data\santa_sleigh.png -> C:\AndroidProjects\Phase7Residents\app\src\main\assets\santa_sleigh.png"
+[RUN] [4/5] gradlew assembleDebug
+[CMD] "[4/5] gradlew assembleDebug" gradlew.bat assembleDebug
+The system cannot find the path specified.
+[FAIL] [4/5] gradlew assembleDebug (RC=3
+"Using APK_SOURCE=C:\AndroidProjects\Phase7Residents\app\build\outputs\apk\debug\app-debug.apk"
+"DONE OK: C:\GitRepos\Phase7Data\Phase7Residents.apk"
