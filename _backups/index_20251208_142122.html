@@ -85,51 +85,6 @@
     /* Push content below fixed header */
     body{ padding-top: 86px; }
 
-    /* ---------- UNIFIED INFO PANEL (TOP-ANCHORED) ---------- */
-    #infoPanel{
-      position: fixed;
-      left: 8px;
-      right: 8px;
-      top: 96px;                 /* under header; adjust if header height changes */
-      z-index: 20000;
-
-      max-height: calc(100vh - 110px);
-      overflow: auto;
-
-      background: rgba(255,255,255,.98);
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
-      box-shadow: 0 12px 22px rgba(0,0,0,.22);
-    }
-    #infoPanel.hidden{ display:none !important; }
-
-    #infoPanel .info-inner{ padding: 12px; }
-    #infoPanel h3{ margin:0 0 6px 0; font-size: 1rem; }
-    #infoPanel p{ margin:4px 0; }
-    #infoPanel .info-actions{
-      display:flex;
-      justify-content:flex-end;
-      padding-top: 10px;
-      gap: 8px;
-    }
-    #infoCloseBtn{
-      padding: 6px 10px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
-      background:#fff;
-      cursor:pointer;
-    }
-
-    /* Optional: if your existing popup HTML uses these classes */
-    .popup-close{
-      padding: 6px 10px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
-      background:#fff;
-      cursor:pointer;
-      font-size: .85rem;
-    }
-
     /* ---------- MAIN ---------- */
     main{
       display:flex;
@@ -183,6 +138,53 @@
       50%  { transform: translate(-50%, -50%) translateY(-4px) rotate(-4deg); }
       100% { transform: translate(-50%, -50%) translateY(4px) rotate(4deg); }
     }
+
+    /* ---------- POPUP ---------- */
+    #lotPopup{
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      z-index: 6000;
+
+      width: min(92vw, 380px);
+      max-height: 55vh;
+      overflow-y: auto;
+
+      background: #fff;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      box-shadow: 0 12px 22px rgba(0,0,0,.22);
+      padding: 10px 12px;
+    }
+    #lotPopup.hidden{ display:none !important; }
+    #lotPopup h3{ margin:0 0 4px 0; font-size:.9rem; }
+    .popup-close{ margin-top:6px; font-size:.75rem; padding:2px 6px; }
+    .popup-inner p{ margin: 2px 0; }
+
+    @media (max-width: 520px){
+      #lotPopup{ max-height: 45vh; }
+    }
+
+    /* ---------- SCENE BANNER (Blue Guitar Park) ---------- */
+    #sceneBanner{
+      position: fixed;
+      top: 96px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(96vw, 760px);
+      z-index: 20000;
+
+      background: rgba(255,255,255,.98);
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      box-shadow: 0 12px 22px rgba(0,0,0,.22);
+      overflow: hidden;
+    }
+    #sceneBanner.hidden{ display:none !important; }
+
+    .scene-title{ font-weight: 900; font-size: 1rem; margin-bottom: 6px; }
+    .scene-body{ font-size: .9rem; line-height: 1.25; color:#111827; }
 
     /* ---------- DOWNLOAD BAR ---------- */
     #download-bar{ margin: 10px 0; text-align:center; }
@@ -248,13 +250,23 @@
     </div>
   </header>
 
-  <!-- Unified Info Panel (lots + events + scenes) -->
-  <div id="infoPanel" class="hidden" aria-hidden="true">
-    <div class="info-inner">
-      <div id="infoBody"></div>
-      <div class="info-actions">
-        <button id="infoCloseBtn" type="button">Close</button>
+  <!-- Scene banner (Blue Guitar Park special case) -->
+  <div id="sceneBanner" class="hidden" aria-hidden="true">
+    <div style="display:flex; gap:12px; padding:12px; align-items:flex-start;">
+      <div class="scene-media" style="position:relative; flex:0 0 auto;">
+        <img id="sceneImg" src="" alt=""
+             style="display:block; width:260px; max-width:40vw; height:auto; border-radius:12px;">
+        <canvas id="sceneSnow" style="position:absolute; inset:0; pointer-events:none;"></canvas>
       </div>
+      <div id="sceneText" style="flex:1 1 auto; min-width:0;"></div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; padding:0 12px 12px;">
+      <button
+        onclick="document.getElementById('sceneBanner')?.classList.add('hidden')"
+        style="padding:6px 10px; border-radius:10px; border:1px solid #d1d5db; background:#fff; cursor:pointer;">
+        Close
+      </button>
     </div>
   </div>
 
@@ -301,6 +313,7 @@
   <main>
     <div class="map-wrapper" id="mapWrapper">
       <canvas id="mapCanvas"></canvas>
+      <div id="lotPopup" class="hidden"></div>
       <div id="spriteLayer"></div>
     </div>
 

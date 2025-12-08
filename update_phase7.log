@@ -1,5 +1,5 @@
 ============================================================
-Logging started: Sun 12/07/2025  0:24:55.96
+Logging started: Mon 12/08/2025 16:19:03.17
 Script: C:\GitRepos\Phase7Data\UpdatePhase7App.bat
 ============================================================
 "Phase 7 App - UPDATE starting..."
@@ -13,7 +13,7 @@ Script: C:\GitRepos\Phase7Data\UpdatePhase7App.bat
 operable program or batch file.
 [FAIL] Python smoke test (RC=9009
 "[*] Backup index.html"
-"Backed up index.html to _backups\index_2025-12-07_00-24-57.html"
+"Backed up index.html to _backups\index_2025-12-08_16-19-16.html"
 [RUN] [1/5] generate_phase7_merged_lots.py
 [CMD] "[1/5] generate_phase7_merged_lots.py" "C:\Users\chuck_6\AppData\Local\Programs\Python\Python312\python.exe" "C:\GitRepos\Phase7Data\generate_phase7_merged_lots.py"
 The system cannot find the path specified.

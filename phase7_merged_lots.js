@@ -3874,9 +3874,9 @@ const phaseResidentsData = [
     "y": 546,
     "phone": null,
     "notes": null,
-    "isChristmasStation": false,
+    "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": null
+    "christmasStationDetails": "Snacks & Treats"
   },
   {
     "phaseNumber": 7,
@@ -6698,7 +6698,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Snacks & Treats"
+    "christmasStationDetails": "Chocolate Pudding Shots & Sage Shortbread Cookies"
   },
   {
     "phaseNumber": 7,

@@ -9,85 +9,111 @@
 
 
 function showSceneBannerFromEvent(ev) {
+	console.log("showSceneBannerFromEvent CALLED", ev);
+
+
   const banner = document.getElementById("sceneBanner");
   const img = document.getElementById("sceneImg");
   const text = document.getElementById("sceneText");
-  const snow = document.getElementById("sceneSnow");
-  if (!banner || !img || !text || !snow) return;
+  const snow = document.getElementById("sceneSnow"); // optional
+console.log("BANNER ELs:", {
+  banner: !!banner, img: !!img, text: !!text, snow: !!snow
+});
+  // Require only what we need to show the banner + image + text
+  if (!banner || !img || !text) return;
 
   banner.classList.remove("hidden");
   banner.setAttribute("aria-hidden", "false");
 
-  const title = ev.label || "Blue Guitar Park";
-  const body = ev.desc || ev.description || ev.body || ev.text || "🎄 Merry Christmas from Blue Guitar Park!";
+  const title = (ev && (ev.label || ev.name)) || "Blue Guitar Park";
+  const body =
+    (ev && (ev.desc || ev.description || ev.body || ev.text)) ||
+    "🎄 Merry Christmas from Blue Guitar Park!";
 
   text.innerHTML = `
     <div class="scene-title">${title}</div>
     <div class="scene-body">${body}</div>
   `;
 
-  // Set the image source (match your real filename!)
-  img.alt = title;
-  img.src = "santa_sleigh.png";
-  const burstSnow = () => {
-  let n = 0;
-  const t = setInterval(() => {
-    n++;
+  // --- helpers ---
+  function forceSnowSizeSafe() {
+    if (!snow) return;
 
-    const media = document.querySelector("#sceneBanner .scene-media");
-    if (media) {
-      const r = media.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0) {
-        snow.style.width = r.width + "px";
-        snow.style.height = r.height + "px";
-      }
+    // use your existing function if present
+    if (typeof forceSceneSnowCanvasSize === "function") {
+      try { forceSceneSnowCanvasSize(); } catch (_) {}
+      return;
     }
 
-    if (typeof stopSceneSnow === "function") stopSceneSnow();
-    if (typeof startSceneSnow === "function") startSceneSnow(snow);
+    // fallback size to .scene-media if present
+    const media = document.querySelector("#sceneBanner .scene-media");
+    if (!media) return;
 
-    if (n >= 10) clearInterval(t);
-  }, 150);
-};
+    const r = media.getBoundingClientRect();
+    if (r.width > 0 && r.height > 0) {
+      snow.style.width = r.width + "px";
+      snow.style.height = r.height + "px";
+    }
+  }
 
-img.onload = () => setTimeout(() => startSceneSnow(snow), 150);
-if (img.complete && img.naturalWidth > 0) setTimeout(() => startSceneSnow(snow), 150);
+  function startSnowSafely() {
+    if (!snow) return;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      forceSnowSizeSafe();
+      if (typeof stopSceneSnow === "function") stopSceneSnow();
+      if (typeof startSceneSnow === "function") startSceneSnow(snow);
+    }));
+  }
 
+  function afterImageReady() {
+    startSnowSafely();
+    // WebView sometimes needs a second kick after layout settles
+    setTimeout(startSnowSafely, 250);
+  }
 
+  // --- set image ---
+  img.alt = title;
 
-  // IMPORTANT: start snow only after image + layout are ready (WebView-safe)
-const startSnowSafely = () => {
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    forceSceneSnowCanvasSize();
-    if (typeof startSceneSnow === "function") startSceneSnow(snow);
-  }));
-};
+  // If your file is in /assets root, this is correct.
+  // If it's in /assets/img/, change to "img/santa_sleigh.png"
+  img.src = "santa_sleigh.png";
 
-
+  // --- image ready pipeline (handles cached + WebView quirks) ---
   const maybeDecode = () => {
-    // decode() is supported on many browsers; if not, fall back
     if (img.decode) {
-      img.decode().then(startSnowSafely).catch(startSnowSafely);
+      img.decode().then(afterImageReady).catch(afterImageReady);
     } else {
-      startSnowSafely();
+      afterImageReady();
     }
   };
 
-  // If image is already cached, onload may not fire in the way you expect
   if (img.complete && img.naturalWidth > 0) {
     maybeDecode();
   } else {
     img.onload = maybeDecode;
-    img.onerror = () => { /* image failed, but don’t crash */ };
+    img.onerror = () => {
+      // image failed—still show banner; just skip image-dependent stuff
+      afterImageReady();
+    };
   }
 
-  banner.scrollIntoView({ block: "start", behavior: "smooth" });
-    // WebView sometimes needs a second kick after layout settles
-  setTimeout(() => startSnowSafely(), 250);
-
+  // Optional: bring banner into view
+  try {
+    banner.scrollIntoView({ block: "start", behavior: "smooth" });
+  } catch (_) {}
 }
+
+
+
+
+
+  //banner.scrollIntoView({ block: "start", behavior: "smooth" });
+    // WebView sometimes needs a second kick after layout settles
+  //setTimeout(() => startSnowSafely(), 250);
+
+
 function forceSceneSnowCanvasSize() {
-  const snow = document.getElementById("sceneSnow");
+
   const media = document.querySelector("#sceneBanner .scene-media");
   if (!snow || !media) return;
 
@@ -339,41 +365,46 @@ function findEventAt(x, y) {
 
   return bestEvent;
 }
-
 function buildEventPopupContent(ev) {
-  const lines = [];
+  if (!ev) return "";
 
-  // Special case: Blue Guitar Park -> show banner, no popup
-  if (ev && (ev.siteId === "BlueGuitarPark" || ev.id === "blue_guitar_scene")) {
-    if (typeof hidePopup === "function") hidePopup();
-    showSceneBannerFromEvent(ev);
-    return null; // tells caller to not open #lotPopup
+  var sid = ev.siteId ? String(ev.siteId) : "";
+  var eid = ev.id ? String(ev.id) : "";
+
+  // Special case: Blue Guitar Park -> sleigh scene
+  if (sid === "BlueGuitarPark" || eid === "blue_guitar_scene") {
+    var title = ev.label || "Blue Guitar Park";
+    var body  = ev.desc || ev.description || ev.body || ev.text || "🎄 Merry Christmas from Blue Guitar Park!";
+
+    return (
+      '<div class="popup-inner">' +
+        '<h3>' + title + '</h3>' +
+        '<p>' + body + '</p>' +
+        '<div style="margin-top:10px;">' +
+          '<img src="santa_sleigh.png" alt="' + title + '" ' +
+               'style="width:100%; max-width:520px; height:auto; border-radius:12px; display:block;">' +
+        '</div>' +
+      '</div>'
+    );
   }
 
-  lines.push(`<h3>${ev.label || "Event"}</h3>`);
+  // Normal event popup (generic)
+  var title2 = ev.label || ev.name || ev.id || "Event";
+  var body2  = ev.desc || ev.description || ev.body || ev.text || "";
 
-  if (ev.type) {
-    const icon = getEventIcon(ev);
-    const prettyType = ev.type.charAt(0).toUpperCase() + ev.type.slice(1);
-    lines.push(`<p>${icon} <strong>Type:</strong> ${prettyType}</p>`);
-  }
-
-  if (ev.description) lines.push(`<p>${ev.description}</p>`);
-
-  if (ev.lotNumber) lines.push(`<p>Near Lot ${ev.lotNumber}</p>`);
-  else if (ev.siteId) lines.push(`<p>Location: ${ev.siteId}</p>`);
-
-  if (ev.seasons && ev.seasons.length > 0) {
-    lines.push(`<p><strong>Season:</strong> ${ev.seasons.join(", ")}</p>`);
-  }
-
-  lines.push(`<button class="popup-close" type="button" onclick="hidePopup()">Close</button>`);
-
-  return `<div class="popup-inner">${lines.join("")}</div>`;
+  return (
+    '<div class="popup-inner">' +
+      '<h3>' + title2 + '</h3>' +
+      (body2 ? '<p>' + body2 + '</p>' : '') +
+    '</div>'
+  );
 }
 
+// keep outside
+window.buildEventPopupContent = buildEventPopupContent;
 
+// Ensure drawEvents exists so draw_lots.js never dies (in case earlier code broke)
+if (typeof window.drawEvents !== "function") {
+  window.drawEvents = function drawEvents() { /* no-op fallback */ };
+}
 
-
-
-  
