@@ -1037,7 +1037,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Coqitos - Cynthia Kelly"
+    "christmasStationDetails": "Coqitos - Paul Vega & Cara Chiusano"
   },
   {
     "phaseNumber": 7,

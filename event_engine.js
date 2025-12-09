@@ -7,6 +7,16 @@
 //   - currentSeasonName, isSeasonOnly (from map_core.js)
 //   - canvas        (from map_core.js initMap)
 
+function shouldShowSnowOverlay() {
+  if (!Array.isArray(EVENTS)) return false;
+  return EVENTS.some(ev =>
+    ev &&
+    ev.type === "snow" &&
+    ev.snowOverlay &&
+    isEventVisible(ev)
+  );
+}
+window.shouldShowSnowOverlay = shouldShowSnowOverlay;
 
 function showSceneBannerFromEvent(ev) {
 	console.log("showSceneBannerFromEvent CALLED", ev);
@@ -36,25 +46,18 @@ console.log("BANNER ELs:", {
   `;
 
   // --- helpers ---
-  function forceSnowSizeSafe() {
-    if (!snow) return;
+function forceSceneSnowCanvasSize() {
+  const snow = document.getElementById("sceneSnow");
+  const media = document.querySelector("#sceneBanner .scene-media");
+  if (!snow || !media) return;
 
-    // use your existing function if present
-    if (typeof forceSceneSnowCanvasSize === "function") {
-      try { forceSceneSnowCanvasSize(); } catch (_) {}
-      return;
-    }
-
-    // fallback size to .scene-media if present
-    const media = document.querySelector("#sceneBanner .scene-media");
-    if (!media) return;
-
-    const r = media.getBoundingClientRect();
-    if (r.width > 0 && r.height > 0) {
-      snow.style.width = r.width + "px";
-      snow.style.height = r.height + "px";
-    }
+  const r = media.getBoundingClientRect();
+  if (r.width > 0 && r.height > 0) {
+    snow.style.width = r.width + "px";
+    snow.style.height = r.height + "px";
   }
+}
+
 
   function startSnowSafely() {
     if (!snow) return;
@@ -301,40 +304,14 @@ function drawEvents(ctx) {
     }
   });
 
+
+
   // Place / remove animated gator sprite
   // updateAlligatorSprite(alligatorPos);
 }
 
-function shouldShowSnowOverlay() {
-  if (!Array.isArray(EVENTS)) return false;
-  return EVENTS.some(ev =>
-    ev.type === "snow" &&
-    ev.snowOverlay &&
-    isEventVisible(ev)
-  );
-}
 
-function drawSnowOverlay(ctx) {
-  if (!shouldShowSnowOverlay()) return;
-  if (!canvas) return;
 
-  ctx.save();
-  ctx.globalAlpha = 0.6;
-  ctx.fillStyle = "rgba(255,255,255,0.9)";
-
-  const stepX = canvas.width / 12;
-  const stepY = canvas.height / 10;
-
-  for (let x = stepX / 2; x < canvas.width; x += stepX) {
-    for (let y = stepY / 2; y < canvas.height; y += stepY) {
-      ctx.beginPath();
-      ctx.arc(x, y, 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  ctx.restore();
-}
 
 function findEventAt(x, y) {
   if (!Array.isArray(EVENTS)) return null;
@@ -365,6 +342,11 @@ function findEventAt(x, y) {
 
   return bestEvent;
 }
+// Snow overlay disabled (snow should only appear on santa_sleigh popup canvas #bgpSnow)
+window.drawSnowOverlay = function drawSnowOverlay(ctx) {
+  // no-op on purpose
+};
+
 function buildEventPopupContent(ev) {
   if (!ev) return "";
 
@@ -380,9 +362,10 @@ function buildEventPopupContent(ev) {
       '<div class="popup-inner">' +
         '<h3>' + title + '</h3>' +
         '<p>' + body + '</p>' +
-        '<div style="margin-top:10px;">' +
-          '<img src="santa_sleigh.png" alt="' + title + '" ' +
-               'style="width:100%; max-width:520px; height:auto; border-radius:12px; display:block;">' +
+        '<div id="bgpMedia" style="position:relative; margin-top:10px; border-radius:12px; overflow:hidden;">' +
+          '<img id="bgpImg" src="santa_sleigh.png" alt="' + title + '" ' +
+               'style="width:100%; max-width:520px; height:auto; display:block;">' +
+          '<canvas id="bgpSnow" style="position:absolute; inset:0; pointer-events:none;"></canvas>' +
         '</div>' +
       '</div>'
     );
@@ -400,11 +383,10 @@ function buildEventPopupContent(ev) {
   );
 }
 
+
 // keep outside
 window.buildEventPopupContent = buildEventPopupContent;
 
 // Ensure drawEvents exists so draw_lots.js never dies (in case earlier code broke)
-if (typeof window.drawEvents !== "function") {
-  window.drawEvents = function drawEvents() { /* no-op fallback */ };
-}
+
 

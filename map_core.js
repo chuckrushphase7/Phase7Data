@@ -13,6 +13,139 @@ let zoomScale = 1;
 // LOTS from phase7_merged_lots.js
 const LOTS = (typeof phaseResidentsData !== "undefined") ? phaseResidentsData : [];
 
+function setupPinchZoomOnWrapper() {
+  const wrap = document.getElementById("mapWrapper");
+  const canvas = document.getElementById("mapCanvas");
+  if (!wrap || !canvas) return;
+
+  let pinching = false;
+  let startDist = 0;
+  let startZoom = 1;
+  let startScrollLeft = 0;
+  let startScrollTop = 0;
+  let startMidX = 0; // midpoint in wrapper coords
+  let startMidY = 0;
+
+  function dist(t1, t2) {
+    const dx = t1.clientX - t2.clientX;
+    const dy = t1.clientY - t2.clientY;
+    return Math.hypot(dx, dy);
+  }
+
+  function midpoint(t1, t2) {
+    return {
+      x: (t1.clientX + t2.clientX) / 2,
+      y: (t1.clientY + t2.clientY) / 2
+    };
+  }
+
+  wrap.addEventListener("touchstart", (e) => {
+    if (e.touches && e.touches.length === 2) {
+      pinching = true;
+      startDist = dist(e.touches[0], e.touches[1]);
+      startZoom = zoomScale;
+
+      startScrollLeft = wrap.scrollLeft;
+      startScrollTop = wrap.scrollTop;
+
+      const mid = midpoint(e.touches[0], e.touches[1]);
+      const r = wrap.getBoundingClientRect();
+      startMidX = (mid.x - r.left);
+      startMidY = (mid.y - r.top);
+
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  wrap.addEventListener("touchmove", (e) => {
+    if (!pinching || !e.touches || e.touches.length !== 2) return;
+
+    const d = dist(e.touches[0], e.touches[1]);
+    if (!startDist) return;
+
+    const factor = d / startDist;
+    const newZoom = Math.max(0.5, Math.min(2.5, startZoom * factor));
+
+    // Content coord under the midpoint BEFORE zoom
+    const cx = (startScrollLeft + startMidX) / startZoom;
+    const cy = (startScrollTop + startMidY) / startZoom;
+
+    // Apply zoom (updates canvas + spriteLayer size)
+    setZoom(newZoom);
+
+    // Re-center so the same content point stays under fingers
+    wrap.scrollLeft = (cx * newZoom) - startMidX;
+    wrap.scrollTop  = (cy * newZoom) - startMidY;
+
+    e.preventDefault();
+  }, { passive: false });
+
+  wrap.addEventListener("touchend", (e) => {
+    if (!e.touches || e.touches.length < 2) {
+      pinching = false;
+    }
+  }, { passive: true });
+}
+
+
+function startBlueGuitarSnow() {
+  const media = document.getElementById("bgpMedia");
+  const snowCanvas = document.getElementById("bgpSnow");
+  if (!media || !snowCanvas) return; // not Blue Guitar / not shown yet
+
+  const r = media.getBoundingClientRect();
+  if (r.width <= 0 || r.height <= 0) return;
+
+  const dpr = window.devicePixelRatio || 1;
+
+  // Size the canvas to the element
+  snowCanvas.width = Math.floor(r.width * dpr);
+  snowCanvas.height = Math.floor(r.height * dpr);
+  snowCanvas.style.width = r.width + "px";
+  snowCanvas.style.height = r.height + "px";
+
+  const ctx = snowCanvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = "rgba(255,255,255,0.95)";
+
+  // Stop previous animation if any
+  if (snowCanvas._snowRAF) cancelAnimationFrame(snowCanvas._snowRAF);
+
+  const flakes = [];
+  const N = Math.min(140, Math.max(60, Math.floor((r.width * r.height) / 7000)));
+  for (let i = 0; i < N; i++) {
+    flakes.push({
+      x: Math.random() * r.width,
+      y: Math.random() * r.height,
+      vy: 0.7 + Math.random() * 1.8,
+      rad: 1 + Math.random() * 2,
+      drift: (Math.random() - 0.5) * 0.7
+    });
+  }
+
+  const tick = () => {
+    ctx.clearRect(0, 0, r.width, r.height);
+    for (const f of flakes) {
+      f.y += f.vy;
+      f.x += f.drift;
+
+      if (f.y > r.height + 6) { f.y = -6; f.x = Math.random() * r.width; }
+      if (f.x < -6) f.x = r.width + 6;
+      if (f.x > r.width + 6) f.x = -6;
+
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.rad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    snowCanvas._snowRAF = requestAnimationFrame(tick);
+  };
+
+  tick();
+}
+window.startBlueGuitarSnow = startBlueGuitarSnow;
+
+
+
 // ------------------------
 // Unified top info panel
 // ------------------------
@@ -29,6 +162,9 @@ function hidePopup() {
   body.innerHTML = "";
   panel.classList.add("hidden");
   panel.setAttribute("aria-hidden", "true");
+  const c = document.getElementById("bgpSnow");
+if (c && c._snowRAF) cancelAnimationFrame(c._snowRAF);
+
 }
 window.hidePopup = hidePopup;
 
@@ -58,20 +194,38 @@ function setZoom(scale) {
   if (!c || !c.width || !c.height) return;
 
   // scale canvas visually (canvas internal pixels stay original)
-  c.style.width = (c.width * zoomScale) + "px";
+  c.style.width  = (c.width  * zoomScale) + "px";
   c.style.height = (c.height * zoomScale) + "px";
 
   // scale sprite layer to match visual canvas size
   const layer = document.getElementById("spriteLayer");
   if (layer) {
-    layer.style.width = (c.width * zoomScale) + "px";
+    layer.style.width  = (c.width  * zoomScale) + "px";
     layer.style.height = (c.height * zoomScale) + "px";
     layer.style.left = "0px";
-    layer.style.top = "0px";
+    layer.style.top  = "0px";
   }
 
-  console.log("GATORS:", document.querySelectorAll(".alligator-sprite").length, "zoomScale=", zoomScale);
+  // Rebuild sprites that depend on zoomScale
+  if (typeof refreshGators === "function") refreshGators();
+
+  // ✅ Important: redraw dots/events/snow overlay after zoom changes
+  if (typeof drawLots === "function") drawLots();
+
+  // If Blue Guitar panel is open, keep snow canvas sized correctly
+  if (typeof startBlueGuitarSnow === "function") {
+    setTimeout(startBlueGuitarSnow, 0);
+  }
+
+  console.log(
+    "GATORS:",
+    document.querySelectorAll(".alligator-sprite").length,
+    "zoomScale=",
+    zoomScale
+  );
 }
+
+
 
 // ------------------------
 // Sprites (gators)
@@ -107,6 +261,8 @@ function refreshGators() {
   upsertGator("alligatorSprite2",  617, 424, 28,  0,  0);
   upsertGator("alligatorSprite3",  345, 605, 28, 16,  0);
   upsertGator("alligatorSprite4",  855, 613, 28, -6,  0);
+
+
 }
 
 // ------------------------
@@ -240,16 +396,21 @@ function showLotPopup(lot) {
 function showEventPopup(ev) {
   console.log("EVENT CLICKED:", ev);
 
-  // event_engine.js provides buildEventPopupContent(ev)
   if (typeof buildEventPopupContent !== "function") {
     console.warn("buildEventPopupContent not found");
     return;
   }
 
-  const html = buildEventPopupContent(ev); // may return null for special cases
+  const html = buildEventPopupContent(ev);
   showInfo(html);
+
+  // start snow overlay over the sleigh image (only runs if bgpSnow exists)
+  setTimeout(() => {
+    if (typeof startBlueGuitarSnow === "function") startBlueGuitarSnow();
+  }, 0);
 }
 window.showEventPopup = showEventPopup;
+
 
 // ------------------------
 // Hit testing + tap handling
@@ -388,6 +549,7 @@ function initMap() {
     console.error("Missing mapCanvas or mapWrapper");
     return;
   }
+	setupPinchZoomOnWrapper();
 
   ctx = canvas.getContext("2d");
   mapImg = new Image();
