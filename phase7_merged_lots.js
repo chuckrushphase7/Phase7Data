@@ -238,7 +238,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Irish Cr\u00e8me shots and mini-pumpkin chocolate chip cookies  -  Debra Nash"
+    "christmasStationDetails": "Irish Cr\u00e8me shots and mini-pumpkin chocolate chip cookies  -  Debra & Rick Nash / Tim & Kathy Brophy"
   },
   {
     "phaseNumber": 7,
@@ -4437,7 +4437,7 @@ const phaseResidentsData = [
     "notes": null,
     "isChristmasStation": true,
     "isSensitive": false,
-    "christmasStationDetails": "Drinks & Light Snacks - Michelle Proser"
+    "christmasStationDetails": "Drinks & Light Snacks - Ruth Ann & Tom Hess / Michelle Proser"
   },
   {
     "phaseNumber": 7,

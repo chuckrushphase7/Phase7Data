@@ -1,5 +1,5 @@
 ============================================================
-Logging started: Tue 12/09/2025 12:36:03.21
+Logging started: Tue 12/09/2025 22:28:41.68
 ============================================================
 Repo   : C:\GitRepos\Phase7Data
 Project: C:\AndroidProjects\Phase7Residents
@@ -29,6 +29,7 @@ Wrote: C:\GitRepos\Phase7Data\apk_info.js
         1 file(s) copied.
         1 file(s) copied.
 [*] Gradle assembleDebug 
+Starting a Gradle Daemon (subsequent builds will be faster)
 Configuration on demand is an incubating feature.
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
@@ -57,8 +58,8 @@ Configuration on demand is an incubating feature.
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
 > Task :app:processDebugJavaRes UP-TO-DATE
-> Task :app:mergeDebugJavaResource UP-TO-DATE
 > Task :app:compressDebugAssets
+> Task :app:mergeDebugJavaResource UP-TO-DATE
 > Task :app:checkDebugDuplicateClasses UP-TO-DATE
 > Task :app:desugarDebugFileDependencies UP-TO-DATE
 > Task :app:mergeExtDexDebug UP-TO-DATE
@@ -75,7 +76,7 @@ Configuration on demand is an incubating feature.
 > Task :app:createDebugApkListingFileRedirect UP-TO-DATE
 > Task :app:assembleDebug
 
-BUILD SUCCESSFUL in 11s
+BUILD SUCCESSFUL in 56s
 34 actionable tasks: 3 executed, 31 up-to-date
 
 --- APK outputs (debug) ---
@@ -84,9 +85,9 @@ BUILD SUCCESSFUL in 11s
 
  Directory of C:\AndroidProjects\Phase7Residents\app\build\outputs\apk\debug
 
-12/09/2025  12:36       247,655,148 app-debug.apk
+12/09/2025  22:29       247,655,148 app-debug.apk
                1 File(s)    247,655,148 bytes
-               0 Dir(s)  61,999,325,184 bytes free
+               0 Dir(s)  59,156,475,904 bytes free
 --- APK outputs (all) ---
 C:\AndroidProjects\Phase7Residents\app\build\outputs\apk\androidTest\debug\app-debug-androidTest.apk
 C:\AndroidProjects\Phase7Residents\app\build\outputs\apk\debug\app-debug.apk
